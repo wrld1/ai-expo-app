@@ -8,7 +8,6 @@ import {
   Alert,
   KeyboardAvoidingView,
   Platform,
-  PlatformColor,
   ScrollView,
   StyleSheet,
   Text,
@@ -25,50 +24,7 @@ import { ScanResult, useHistory } from "../context/HistoryContext";
 import { useProfile } from "../context/ProfileContext";
 import { analyzeFoodImage } from "../services/gemini";
 import NativeIcon from "./NativeIcon";
-
-const colors = {
-  label: Platform.select({
-    ios: PlatformColor("label") as any,
-    android: PlatformColor("?attr/colorOnSurface") as any,
-    default: "#FFFFFF",
-  }),
-  secondaryLabel: Platform.select({
-    ios: PlatformColor("secondaryLabel") as any,
-    android: PlatformColor("?attr/colorOnSurfaceVariant") as any,
-    default: "#8E8E93",
-  }),
-  systemBackground: Platform.select({
-    ios: PlatformColor("systemBackground") as any,
-    android: PlatformColor("?attr/colorBackground") as any,
-    default: "#121417",
-  }),
-  secondarySystemGroupedBackground: Platform.select({
-    ios: PlatformColor("secondarySystemGroupedBackground") as any,
-    android: PlatformColor("?attr/colorSurfaceContainer") as any,
-    default: "#1C1C1E",
-  }),
-  separator: Platform.select({
-    ios: PlatformColor("separator") as any,
-    android: PlatformColor("?attr/colorOutlineVariant") as any,
-    default: "rgba(255,255,255,0.08)",
-  }),
-  accent: Platform.select({
-    ios: PlatformColor("systemGreen") as any,
-    android: PlatformColor("?attr/colorPrimary") as any,
-    default: "#2CE2A2",
-  }),
-  systemRed: Platform.select({
-    ios: PlatformColor("systemRed") as any,
-    android: PlatformColor("?attr/colorError") as any,
-    default: "#FF453A",
-  }),
-  systemOrange: Platform.select({
-    ios: PlatformColor("systemOrange") as any,
-    android: PlatformColor("?attr/colorTertiary") as any,
-    default: "#FF9500",
-  }),
-  placeholder: "#6B7280",
-};
+import { colors } from "../constants/theme";
 
 export default function ScanView() {
   const { profile, getEffectiveApiKey } = useProfile();
@@ -309,7 +265,6 @@ export default function ScanView() {
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === "ios" ? "padding" : "height"}
-      keyboardVerticalOffset={Platform.OS === "ios" ? 88 : 0}
       style={{ flex: 1, backgroundColor: colors.systemBackground }}
     >
       <ScrollView
@@ -389,10 +344,13 @@ export default function ScanView() {
                 Що ви сьогодні їсте?
               </Text>
               <Text
-                style={[styles.placeholderSub, { color: colors.secondaryLabel }]}
+                style={[
+                  styles.placeholderSub,
+                  { color: colors.secondaryLabel },
+                ]}
               >
-                Зробіть фото вашої тарілки або завантажте зображення з галереї для
-                миттєвого підрахунку КБЖВ
+                Зробіть фото вашої тарілки або завантажте зображення з галереї
+                для миттєвого підрахунку КБЖВ
               </Text>
 
               <View style={styles.actionButtonsRow}>
@@ -430,7 +388,10 @@ export default function ScanView() {
                     color={colors.accent}
                   />
                   <Text
-                    style={[styles.actionBtnTextLight, { color: colors.accent }]}
+                    style={[
+                      styles.actionBtnTextLight,
+                      { color: colors.accent },
+                    ]}
                   >
                     Галерея
                   </Text>

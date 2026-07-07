@@ -5,7 +5,6 @@ import {
   Alert,
   KeyboardAvoidingView,
   Platform,
-  PlatformColor,
   ScrollView,
   StyleSheet,
   Text,
@@ -13,6 +12,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import { colors } from "../constants/theme";
 import { useProfile } from "../context/ProfileContext";
 
 const ALLERGY_PRESETS = [
@@ -33,45 +33,6 @@ const CONCERN_PRESETS = [
   "Набір м'язової маси",
   "Загальний тонус",
 ];
-
-const colors = {
-  label: Platform.select({
-    ios: PlatformColor("label") as any,
-    android: PlatformColor("?attr/colorOnSurface") as any,
-    default: "#FFFFFF",
-  }),
-  secondaryLabel: Platform.select({
-    ios: PlatformColor("secondaryLabel") as any,
-    android: PlatformColor("?attr/colorOnSurfaceVariant") as any,
-    default: "#8E8E93",
-  }),
-  systemBackground: Platform.select({
-    ios: PlatformColor("systemBackground") as any,
-    android: PlatformColor("?attr/colorBackground") as any,
-    default: "#121417",
-  }),
-  secondarySystemGroupedBackground: Platform.select({
-    ios: PlatformColor("secondarySystemGroupedBackground") as any,
-    android: PlatformColor("?attr/colorSurfaceContainer") as any,
-    default: "#1C1C1E",
-  }),
-  separator: Platform.select({
-    ios: PlatformColor("separator") as any,
-    android: PlatformColor("?attr/colorOutlineVariant") as any,
-    default: "rgba(255,255,255,0.08)",
-  }),
-  accent: Platform.select({
-    ios: PlatformColor("systemGreen") as any,
-    android: PlatformColor("?attr/colorPrimary") as any,
-    default: "#2CE2A2",
-  }),
-  systemRed: Platform.select({
-    ios: PlatformColor("systemRed") as any,
-    android: PlatformColor("?attr/colorError") as any,
-    default: "#FF453A",
-  }),
-  placeholder: "#6B7280",
-};
 
 export default function ProfileView() {
   const { profile, updateProfile } = useProfile();
@@ -157,14 +118,13 @@ export default function ProfileView() {
     <KeyboardAvoidingView
       behavior={Platform.OS === "ios" ? "padding" : "height"}
       style={[styles.container, { backgroundColor: colors.systemBackground }]}
-      keyboardVerticalOffset={Platform.OS === "ios" ? 88 : 0}
     >
       <ScrollView
         contentInsetAdjustmentBehavior="automatic"
         contentContainerStyle={styles.scrollContent}
       >
         <Text style={[styles.groupHeader, { color: colors.secondaryLabel }]}>
-          ПЕРСОНАЛЬНІ ДАНІ
+          Персональні дані
         </Text>
         <View
           style={[
@@ -226,7 +186,7 @@ export default function ProfileView() {
         </View>
 
         <Text style={[styles.groupHeader, { color: colors.secondaryLabel }]}>
-          АЛЕРГІЇ ТА ОБМЕЖЕННЯ
+          Алергії та обмеження
         </Text>
         <View
           style={[
@@ -360,7 +320,7 @@ export default function ProfileView() {
         </View>
 
         <Text style={[styles.groupHeader, { color: colors.secondaryLabel }]}>
-          ЦІЛІ ТА СИМПТОМИ
+          Цілі та симптоми
         </Text>
         <View
           style={[
@@ -417,7 +377,7 @@ export default function ProfileView() {
         </View>
 
         <Text style={[styles.groupHeader, { color: colors.secondaryLabel }]}>
-          AI КОНФІГУРАЦІЯ
+          AI Конфігурація
         </Text>
         <View
           style={[

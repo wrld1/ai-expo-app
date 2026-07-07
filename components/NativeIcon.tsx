@@ -1,11 +1,13 @@
 import React from "react";
 import Ionicons from "@react-native-vector-icons/ionicons";
 
+import { ColorValue } from "react-native";
+
 interface NativeIconProps {
   sf: string;
   ion: string;
   size?: number;
-  color?: string;
+  color?: ColorValue;
   style?: any;
 }
 

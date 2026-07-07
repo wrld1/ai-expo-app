@@ -7,7 +7,6 @@ import {
   FlatList,
   Modal,
   Platform,
-  PlatformColor,
   ScrollView,
   StyleSheet,
   Text,
@@ -17,6 +16,7 @@ import {
 import Animated, { FadeIn, FadeOut } from "react-native-reanimated";
 import { HistoryItem, useHistory } from "../context/HistoryContext";
 import NativeIcon from "./NativeIcon";
+import { colors } from "../constants/theme";
 
 const formatUkDate = (dateString: string) => {
   try {
@@ -51,50 +51,6 @@ const formatUkDate = (dateString: string) => {
   } catch {
     return dateString;
   }
-};
-
-const colors = {
-  label: Platform.select({
-    ios: PlatformColor("label") as any,
-    android: PlatformColor("?attr/colorOnSurface") as any,
-    default: "#FFFFFF",
-  }),
-  secondaryLabel: Platform.select({
-    ios: PlatformColor("secondaryLabel") as any,
-    android: PlatformColor("?attr/colorOnSurfaceVariant") as any,
-    default: "#8E8E93",
-  }),
-  systemBackground: Platform.select({
-    ios: PlatformColor("systemBackground") as any,
-    android: PlatformColor("?attr/colorBackground") as any,
-    default: "#121417",
-  }),
-  secondarySystemGroupedBackground: Platform.select({
-    ios: PlatformColor("secondarySystemGroupedBackground") as any,
-    android: PlatformColor("?attr/colorSurfaceContainer") as any,
-    default: "#1C1C1E",
-  }),
-  separator: Platform.select({
-    ios: PlatformColor("separator") as any,
-    android: PlatformColor("?attr/colorOutlineVariant") as any,
-    default: "rgba(255,255,255,0.08)",
-  }),
-  accent: Platform.select({
-    ios: PlatformColor("systemGreen") as any,
-    android: PlatformColor("?attr/colorPrimary") as any,
-    default: "#2CE2A2",
-  }),
-  systemRed: Platform.select({
-    ios: PlatformColor("systemRed") as any,
-    android: PlatformColor("?attr/colorError") as any,
-    default: "#FF453A",
-  }),
-  systemOrange: Platform.select({
-    ios: PlatformColor("systemOrange") as any,
-    android: PlatformColor("?attr/colorTertiary") as any,
-    default: "#FF9500",
-  }),
-  placeholder: "#6B7280",
 };
 
 export default function HistoryView() {
