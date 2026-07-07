@@ -1,35 +1,32 @@
-import { Tabs } from 'expo-router';
-import React from 'react';
+import { NativeTabs, Label, Icon, VectorIcon } from "expo-router/unstable-native-tabs";
+import Ionicons from "@react-native-vector-icons/ionicons";
 
-import { HapticTab } from '@/components/haptic-tab';
-import { IconSymbol } from '@/components/ui/icon-symbol';
-import { Colors } from '@/constants/theme';
-import { useColorScheme } from '@/hooks/use-color-scheme';
-
-export default function TabLayout() {
-  const colorScheme = useColorScheme();
-
+export default function TabsLayout() {
   return (
-    <Tabs
-      screenOptions={{
-        tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
-        headerShown: false,
-        tabBarButton: HapticTab,
-      }}>
-      <Tabs.Screen
-        name="index"
-        options={{
-          title: 'Home',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="house.fill" color={color} />,
-        }}
-      />
-      <Tabs.Screen
-        name="explore"
-        options={{
-          title: 'Explore',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="paperplane.fill" color={color} />,
-        }}
-      />
-    </Tabs>
+    <NativeTabs>
+      <NativeTabs.Trigger name="index">
+        <Label>Аналіз</Label>
+        <Icon 
+          sf="camera.viewfinder" 
+          androidSrc={<VectorIcon family={Ionicons} name="camera" />} 
+        />
+      </NativeTabs.Trigger>
+
+      <NativeTabs.Trigger name="history">
+        <Label>Журнал</Label>
+        <Icon 
+          sf="clock.fill" 
+          androidSrc={<VectorIcon family={Ionicons} name="time" />} 
+        />
+      </NativeTabs.Trigger>
+
+      <NativeTabs.Trigger name="profile">
+        <Label>Профіль</Label>
+        <Icon 
+          sf="person.crop.circle.fill" 
+          androidSrc={<VectorIcon family={Ionicons} name="person" />} 
+        />
+      </NativeTabs.Trigger>
+    </NativeTabs>
   );
 }
