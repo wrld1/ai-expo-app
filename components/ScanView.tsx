@@ -22,16 +22,17 @@ import Animated, {
 import { analyzeFoodImageBackend } from "../api/analyze";
 import { colors } from "../constants/theme";
 import { useHistory } from "../context/HistoryContext";
-import { ScanResult } from "../types/history";
 import { useProfile } from "../context/ProfileContext";
+import { ScanResult } from "../types/history";
 import {
   triggerHapticError,
   triggerHapticLight,
   triggerHapticMedium,
   triggerHapticSuccess,
 } from "../utils/haptics";
-import NativeIcon from "./NativeIcon";
 import ScanResultCard from "./ScanResultCard";
+import Card from "./ui/Card";
+import NativeIcon from "./ui/NativeIcon";
 
 export default function ScanView() {
   const { profile } = useProfile();
@@ -189,8 +190,8 @@ export default function ScanView() {
 
   return (
     <KeyboardAvoidingView
-      behavior={Platform.OS === "ios" ? "padding" : "height"}
-      style={{ flex: 1, backgroundColor: colors.systemBackground }}
+      style={{ flex: 1, backgroundColor: colors.systemGroupedBackground }}
+      behavior={Platform.OS === "ios" ? "padding" : undefined}
     >
       <ScrollView
         contentInsetAdjustmentBehavior="automatic"
@@ -266,7 +267,7 @@ export default function ScanView() {
                 />
               </View>
               <Text style={[styles.placeholderTitle, { color: colors.label }]}>
-                Що ви сьогодні їсте?
+                Завантажте фото вашої страви
               </Text>
               <Text
                 style={[
@@ -402,12 +403,10 @@ export default function ScanView() {
                     </Text>
                   </View>
 
-                  <View
+                  <Card
                     style={[
-                      styles.correctionCard,
+                      styles.correctionCardOverrides,
                       {
-                        backgroundColor:
-                          colors.secondarySystemGroupedBackground,
                         borderColor: "rgba(44, 226, 162, 0.15)",
                       },
                     ]}
@@ -468,7 +467,7 @@ export default function ScanView() {
                         )}
                       </TouchableOpacity>
                     </View>
-                  </View>
+                  </Card>
                 </Animated.View>
               </LayoutAnimationConfig>
             )}
@@ -620,112 +619,6 @@ const styles = StyleSheet.create({
     marginTop: 4,
   },
   resultsContainer: {},
-  resultHeaderCard: {
-    borderRadius: 12,
-    borderCurve: "continuous",
-    padding: 14,
-    marginBottom: 12,
-    boxShadow: "0 1px 2px rgba(0,0,0,0.05)",
-  },
-  resultLabel: {
-    fontSize: 12,
-    marginBottom: 4,
-  },
-  resultFoodName: {
-    fontSize: 18,
-    fontWeight: "700",
-  },
-  resultsCard: {
-    borderRadius: 14,
-    borderCurve: "continuous",
-    padding: 16,
-    marginBottom: 12,
-    boxShadow: "0 1px 2px rgba(0,0,0,0.05)",
-  },
-  resultsCardTitle: {
-    fontSize: 15,
-    fontWeight: "700",
-    marginBottom: 12,
-  },
-  macroProgressContainer: {
-    marginBottom: 10,
-  },
-  macroHeaderRow: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    marginBottom: 4,
-  },
-  macroLabel: {
-    fontSize: 13,
-  },
-  macroValue: {
-    fontSize: 13,
-    fontWeight: "700",
-  },
-  macroTrack: {
-    height: 8,
-    backgroundColor: "rgba(255, 255, 255, 0.05)",
-    borderRadius: 4,
-    overflow: "hidden",
-  },
-  macroBar: {
-    height: "100%",
-    borderRadius: 4,
-  },
-  ingredientRow: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    paddingVertical: 8,
-    borderBottomWidth: 1,
-  },
-  ingredientName: {
-    fontSize: 14,
-  },
-  ingredientWeight: {
-    fontSize: 14,
-    fontWeight: "600",
-  },
-  subSectionLabel: {
-    fontSize: 12,
-    fontWeight: "600",
-    marginTop: 8,
-    marginBottom: 6,
-  },
-  insightRow: {
-    flexDirection: "row",
-    backgroundColor: "rgba(255, 255, 255, 0.03)",
-    borderRadius: 10,
-    borderCurve: "continuous",
-    padding: 10,
-    marginBottom: 10,
-    alignItems: "flex-start",
-    borderLeftWidth: 3,
-  },
-  goodInsightBorder: {
-    borderLeftColor: "#2CE2A2",
-  },
-  riskInsightBorder: {
-    borderLeftColor: "#FF9500",
-  },
-  insightText: {
-    fontSize: 13,
-    lineHeight: 18,
-    marginLeft: 8,
-    flex: 1,
-  },
-  summaryBox: {
-    backgroundColor: "rgba(255, 255, 255, 0.03)",
-    borderRadius: 10,
-    borderCurve: "continuous",
-    padding: 12,
-    borderWidth: 1,
-    borderColor: "rgba(255, 255, 255, 0.04)",
-  },
-  summaryText: {
-    fontSize: 13,
-    lineHeight: 18,
-    fontStyle: "italic",
-  },
   warningCard: {
     flexDirection: "row",
     backgroundColor: "rgba(255, 255, 255, 0.02)",
@@ -741,11 +634,8 @@ const styles = StyleSheet.create({
     marginLeft: 8,
     flex: 1,
   },
-  correctionCard: {
-    borderRadius: 14,
-    borderCurve: "continuous",
+  correctionCardOverrides: {
     padding: 16,
-    borderWidth: 1,
   },
   correctionTitle: {
     fontSize: 14,

@@ -12,8 +12,9 @@ import { colors } from "../constants/theme";
 import { HistoryItem } from "../types/history";
 import { formatUkDate } from "../utils/date";
 import { triggerHapticLight } from "../utils/haptics";
-import NativeIcon from "./NativeIcon";
 import ScanResultCard from "./ScanResultCard";
+import Card from "./ui/Card";
+import NativeIcon from "./ui/NativeIcon";
 
 interface HistoryItemModalProps {
   visible: boolean;
@@ -41,7 +42,7 @@ export default function HistoryItemModal({
         <View
           style={[
             styles.modalContent,
-            { backgroundColor: colors.systemBackground },
+            { backgroundColor: colors.systemGroupedBackground },
           ]}
         >
           <View
@@ -94,17 +95,7 @@ export default function HistoryItemModal({
                   Історія уточнень
                 </Text>
                 {item.correctionHistory.map((corr, idx) => (
-                  <View
-                    key={idx}
-                    style={[
-                      styles.correctionHistoryRow,
-                      {
-                        backgroundColor:
-                          colors.secondarySystemGroupedBackground,
-                        borderColor: colors.separator,
-                      },
-                    ]}
-                  >
+                  <Card key={idx} style={styles.correctionHistoryRowOverrides}>
                     <View style={styles.corrUserBubble}>
                       <Text
                         style={[styles.corrUserText, { color: colors.label }]}
@@ -127,7 +118,7 @@ export default function HistoryItemModal({
                         {corr.result.calories} ккал)
                       </Text>
                     </View>
-                  </View>
+                  </Card>
                 ))}
               </View>
             )}
@@ -210,12 +201,9 @@ const styles = StyleSheet.create({
     marginTop: 16,
     marginBottom: 8,
   },
-  correctionHistoryRow: {
-    borderRadius: 10,
-    borderCurve: "continuous",
+  correctionHistoryRowOverrides: {
     padding: 12,
     marginBottom: 8,
-    borderWidth: 1,
   },
   corrUserBubble: {
     backgroundColor: "rgba(255, 255, 255, 0.04)",

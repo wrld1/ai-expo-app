@@ -1,8 +1,8 @@
-import React from "react";
 import { StyleSheet, Text, View } from "react-native";
 import { colors } from "../constants/theme";
 import { ScanResult } from "../types/history";
-import NativeIcon from "./NativeIcon";
+import Card from "./ui/Card";
+import NativeIcon from "./ui/NativeIcon";
 
 interface ScanResultCardProps {
   result: ScanResult;
@@ -51,16 +51,9 @@ export default function ScanResultCard({ result }: ScanResultCardProps) {
 
   return (
     <View style={styles.container}>
-      <View
-        style={[
-          styles.resultHeaderCard,
-          {
-            backgroundColor: colors.secondarySystemGroupedBackground,
-          },
-        ]}
-      >
+      <Card style={styles.resultHeaderCardOverrides}>
         <Text style={[styles.resultLabel, { color: colors.secondaryLabel }]}>
-          AI розпізнав страву:
+          AI ПРОАНАЛІЗУВАВ ФОТО:
         </Text>
         <Text
           style={[styles.resultFoodName, { color: colors.label }]}
@@ -68,18 +61,11 @@ export default function ScanResultCard({ result }: ScanResultCardProps) {
         >
           {result.foodName}
         </Text>
-      </View>
+      </Card>
 
-      <View
-        style={[
-          styles.resultsCard,
-          {
-            backgroundColor: colors.secondarySystemGroupedBackground,
-          },
-        ]}
-      >
+      <Card style={styles.resultsCardOverrides}>
         <Text style={[styles.resultsCardTitle, { color: colors.label }]}>
-          КБЖВ показники
+          МАКРОНУТРІЄНТИ
         </Text>
 
         {renderMacroProgress(
@@ -92,19 +78,12 @@ export default function ScanResultCard({ result }: ScanResultCardProps) {
         {renderMacroProgress(result.protein, 80, "Білки", "#4CAF50")}
         {renderMacroProgress(result.fat, 70, "Жири", "#FFC107")}
         {renderMacroProgress(result.carbs, 150, "Вуглеводи", "#00BCD4")}
-      </View>
+      </Card>
 
       {result.ingredients && result.ingredients.length > 0 && (
-        <View
-          style={[
-            styles.resultsCard,
-            {
-              backgroundColor: colors.secondarySystemGroupedBackground,
-            },
-          ]}
-        >
+        <Card style={styles.resultsCardOverrides}>
           <Text style={[styles.resultsCardTitle, { color: colors.label }]}>
-            Інгредієнти на тарілці
+            ВИЯВЛЕНІ ІНГРЕДІЄНТИ
           </Text>
           {result.ingredients.map((ing, idx) => (
             <View
@@ -122,19 +101,12 @@ export default function ScanResultCard({ result }: ScanResultCardProps) {
               </Text>
             </View>
           ))}
-        </View>
+        </Card>
       )}
 
-      <View
-        style={[
-          styles.resultsCard,
-          {
-            backgroundColor: colors.secondarySystemGroupedBackground,
-          },
-        ]}
-      >
+      <Card style={styles.resultsCardOverrides}>
         <Text style={[styles.resultsCardTitle, { color: colors.label }]}>
-          Персональний аналіз
+          ДЕТАЛЬНИЙ АНАЛІЗ
         </Text>
 
         <Text
@@ -190,7 +162,7 @@ export default function ScanResultCard({ result }: ScanResultCardProps) {
             {result.summary}
           </Text>
         </View>
-      </View>
+      </Card>
     </View>
   );
 }
@@ -199,10 +171,8 @@ const styles = StyleSheet.create({
   container: {
     width: "100%",
   },
-  resultHeaderCard: {
+  resultHeaderCardOverrides: {
     padding: 16,
-    borderRadius: 14,
-    borderCurve: "continuous",
     marginBottom: 16,
     alignItems: "center",
   },
@@ -217,10 +187,8 @@ const styles = StyleSheet.create({
     fontWeight: "700",
     textAlign: "center",
   },
-  resultsCard: {
+  resultsCardOverrides: {
     padding: 16,
-    borderRadius: 14,
-    borderCurve: "continuous",
     marginBottom: 16,
   },
   resultsCardTitle: {

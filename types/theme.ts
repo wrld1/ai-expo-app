@@ -4,6 +4,7 @@ export interface ThemeColors {
   label: ColorValue;
   secondaryLabel: ColorValue;
   systemBackground: ColorValue;
+  systemGroupedBackground: ColorValue;
   secondarySystemGroupedBackground: ColorValue;
   separator: ColorValue;
   accent: ColorValue;

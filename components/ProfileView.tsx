@@ -247,7 +247,7 @@ export default function ProfileView() {
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === "ios" ? "padding" : "height"}
-      style={[styles.container, { backgroundColor: colors.systemBackground }]}
+      style={[styles.container, { backgroundColor: colors.systemGroupedBackground }]}
     >
       <ScrollView
         contentInsetAdjustmentBehavior="automatic"

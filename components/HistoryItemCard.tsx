@@ -1,12 +1,12 @@
 import { Image } from "expo-image";
 import React from "react";
-import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { Alert, StyleSheet, Text, View } from "react-native";
 import Animated, { FadeIn, FadeOut } from "react-native-reanimated";
 import { colors } from "../constants/theme";
 import { HistoryItem } from "../types/history";
 import { formatUkDate } from "../utils/date";
 import { triggerHapticLight } from "../utils/haptics";
-import NativeIcon from "./NativeIcon";
+import Card from "./ui/Card";
 
 interface HistoryItemCardProps {
   item: HistoryItem;
@@ -20,19 +20,29 @@ export default function HistoryItemCard({
   onDelete,
 }: HistoryItemCardProps) {
   const { result } = item;
+
   return (
     <Animated.View entering={FadeIn} exiting={FadeOut}>
-      <TouchableOpacity
-        style={[
-          styles.card,
-          {
-            backgroundColor: colors.secondarySystemGroupedBackground,
-            borderColor: colors.separator,
-          },
-        ]}
+      <Card
+        style={styles.cardOverrides}
         onPress={() => {
           triggerHapticLight();
           onPress(item);
+        }}
+        onLongPress={() => {
+          triggerHapticLight();
+          Alert.alert(
+            "Видалити запис?",
+            "Ви впевнені, що хочете видалити цей запис з журналу?",
+            [
+              { text: "Скасувати", style: "cancel" },
+              {
+                text: "Видалити",
+                style: "destructive",
+                onPress: () => onDelete(item.id),
+              },
+            ],
+          );
         }}
         activeOpacity={0.8}
       >
@@ -134,32 +144,17 @@ export default function HistoryItemCard({
             </View>
           </View>
         </View>
-        <TouchableOpacity
-          style={styles.cardDeleteBtn}
-          onPress={() => onDelete(item.id)}
-          activeOpacity={0.7}
-        >
-          <NativeIcon
-            sf="trash"
-            color={colors.systemRed}
-            size={18}
-            ion="trash-outline"
-          />
-        </TouchableOpacity>
-      </TouchableOpacity>
+      </Card>
     </Animated.View>
   );
 }
 
 const styles = StyleSheet.create({
-  card: {
-    borderRadius: 16,
-    borderCurve: "continuous",
+  cardOverrides: {
     flexDirection: "row",
     padding: 12,
     marginBottom: 12,
     alignItems: "center",
-    boxShadow: "0 1px 2px rgba(0,0,0,0.05)",
   },
   cardImage: {
     width: 64,
@@ -188,6 +183,7 @@ const styles = StyleSheet.create({
   },
   kbjvItem: {
     flexDirection: "column",
+    alignItems: "center",
   },
   kbjvValue: {
     fontSize: 12,
@@ -202,8 +198,5 @@ const styles = StyleSheet.create({
     width: 1,
     height: 14,
     marginHorizontal: 8,
-  },
-  cardDeleteBtn: {
-    padding: 8,
   },
 });

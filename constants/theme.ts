@@ -24,6 +24,11 @@ export const colors: ThemeColors = {
     android: safePlatformColor("?attr/colorBackground", "#121417"),
     default: "#121417",
   })!,
+  systemGroupedBackground: Platform.select<ColorValue>({
+    ios: safePlatformColor("systemGroupedBackground", "#000000"),
+    android: safePlatformColor("?attr/colorSurface", "#000000"),
+    default: "#000000",
+  })!,
   secondarySystemGroupedBackground: Platform.select<ColorValue>({
     ios: safePlatformColor("secondarySystemGroupedBackground", "#1C1C1E"),
     android: safePlatformColor("?attr/colorSurfaceContainer", "#1C1C1E"),
@@ -57,7 +62,7 @@ export const colors: ThemeColors = {
 
 export const nativeStyles = StyleSheet.create({
   card: {
-    borderRadius: 10,
+    borderRadius: 16,
     ...Platform.select({
       ios: {
         borderCurve: "continuous",

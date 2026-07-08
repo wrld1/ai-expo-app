@@ -8,10 +8,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import {
-  SafeAreaView,
-  useSafeAreaInsets,
-} from "react-native-safe-area-context";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { colors } from "../constants/theme";
 import { useHistory } from "../context/HistoryContext";
 import { HistoryItem } from "../types/history";
@@ -21,7 +18,7 @@ import {
   triggerHapticSuccess,
 } from "../utils/haptics";
 import HistoryItemModal from "./HistoryItemModal";
-import NativeIcon from "./NativeIcon";
+import NativeIcon from "./ui/NativeIcon";
 
 import HistoryItemCard from "./HistoryItemCard";
 
@@ -80,11 +77,12 @@ export default function HistoryView() {
     />
   );
 
-  const insets = useSafeAreaInsets();
-
   return (
     <SafeAreaView
-      style={[styles.container, { backgroundColor: colors.systemBackground }]}
+      style={[
+        styles.container,
+        { backgroundColor: colors.systemGroupedBackground },
+      ]}
     >
       {history.length > 0 ? (
         <View style={{ flex: 1 }}>
