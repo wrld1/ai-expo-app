@@ -16,6 +16,12 @@ import {
 import Animated, { FadeIn, FadeOut } from "react-native-reanimated";
 import { HistoryItem, useHistory } from "../context/HistoryContext";
 import NativeIcon from "./NativeIcon";
+import ScanResultCard from "./ScanResultCard";
+import {
+  triggerHapticLight,
+  triggerHapticMedium,
+  triggerHapticSuccess,
+} from "../utils/haptics";
 import { colors } from "../constants/theme";
 
 const formatUkDate = (dateString: string) => {
@@ -58,24 +64,8 @@ export default function HistoryView() {
   const [selectedItem, setSelectedItem] = useState<HistoryItem | null>(null);
   const router = useRouter();
 
-  const triggerHaptic = (
-    style: Haptics.ImpactFeedbackStyle = Haptics.ImpactFeedbackStyle.Light,
-  ) => {
-    if (Platform.OS === "ios") {
-      Haptics.impactAsync(style).catch(() => {});
-    }
-  };
-
-  const triggerSuccessHaptic = () => {
-    if (Platform.OS === "ios") {
-      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success).catch(
-        () => {},
-      );
-    }
-  };
-
   const handleDelete = (id: string) => {
-    triggerHaptic(Haptics.ImpactFeedbackStyle.Medium);
+    triggerHapticMedium();
     Alert.alert(
       "Видалити запис?",
       "Ви впевнені, що хочете видалити цей аналіз з історії?",
@@ -89,7 +79,7 @@ export default function HistoryView() {
             if (selectedItem?.id === id) {
               setSelectedItem(null);
             }
-            triggerSuccessHaptic();
+            triggerHapticSuccess();
           },
         },
       ],
@@ -97,7 +87,7 @@ export default function HistoryView() {
   };
 
   const handleClearAll = () => {
-    triggerHaptic(Haptics.ImpactFeedbackStyle.Medium);
+    triggerHapticMedium();
     Alert.alert(
       "Очистити історію?",
       "Це видалить всі проаналізовані страви. Цю дію неможливо скасувати.",
@@ -109,7 +99,7 @@ export default function HistoryView() {
           onPress: async () => {
             await clearHistory();
             setSelectedItem(null);
-            triggerSuccessHaptic();
+            triggerHapticSuccess();
           },
         },
       ],
@@ -129,7 +119,7 @@ export default function HistoryView() {
             },
           ]}
           onPress={() => {
-            triggerHaptic();
+            triggerHapticLight();
             setSelectedItem(item);
           }}
           activeOpacity={0.8}
@@ -306,7 +296,7 @@ export default function HistoryView() {
           <TouchableOpacity
             style={[styles.scanButton, { backgroundColor: colors.accent }]}
             onPress={() => {
-              triggerHaptic();
+              triggerHapticLight();
               router.push("/" as any);
             }}
             activeOpacity={0.8}
@@ -345,7 +335,7 @@ export default function HistoryView() {
                 <TouchableOpacity
                   style={styles.closeModalBtn}
                   onPress={() => {
-                    triggerHaptic();
+                    triggerHapticLight();
                     setSelectedItem(null);
                   }}
                 >
@@ -374,225 +364,7 @@ export default function HistoryView() {
                   Проаналізовано: {formatUkDate(selectedItem.date)}
                 </Text>
 
-                <View style={styles.modalKbjvContainer}>
-                  <View
-                    style={[
-                      styles.modalKbjvCard,
-                      {
-                        backgroundColor:
-                          colors.secondarySystemGroupedBackground,
-                        borderColor: colors.separator,
-                      },
-                    ]}
-                  >
-                    <Text
-                      style={[
-                        styles.modalKbjvValue,
-                        { color: colors.label, fontVariant: ["tabular-nums"] },
-                      ]}
-                    >
-                      {selectedItem.result.calories}
-                    </Text>
-                    <Text
-                      style={[
-                        styles.modalKbjvLabel,
-                        { color: colors.secondaryLabel },
-                      ]}
-                    >
-                      Калорії
-                    </Text>
-                  </View>
-                  <View
-                    style={[
-                      styles.modalKbjvCard,
-                      {
-                        backgroundColor:
-                          colors.secondarySystemGroupedBackground,
-                        borderColor: colors.separator,
-                      },
-                    ]}
-                  >
-                    <Text
-                      style={[
-                        styles.modalKbjvValue,
-                        { color: colors.label, fontVariant: ["tabular-nums"] },
-                      ]}
-                    >
-                      {selectedItem.result.protein}г
-                    </Text>
-                    <Text
-                      style={[
-                        styles.modalKbjvLabel,
-                        { color: colors.secondaryLabel },
-                      ]}
-                    >
-                      Білки
-                    </Text>
-                  </View>
-                  <View
-                    style={[
-                      styles.modalKbjvCard,
-                      {
-                        backgroundColor:
-                          colors.secondarySystemGroupedBackground,
-                        borderColor: colors.separator,
-                      },
-                    ]}
-                  >
-                    <Text
-                      style={[
-                        styles.modalKbjvValue,
-                        { color: colors.label, fontVariant: ["tabular-nums"] },
-                      ]}
-                    >
-                      {selectedItem.result.fat}г
-                    </Text>
-                    <Text
-                      style={[
-                        styles.modalKbjvLabel,
-                        { color: colors.secondaryLabel },
-                      ]}
-                    >
-                      Жири
-                    </Text>
-                  </View>
-                  <View
-                    style={[
-                      styles.modalKbjvCard,
-                      {
-                        backgroundColor:
-                          colors.secondarySystemGroupedBackground,
-                        borderColor: colors.separator,
-                      },
-                    ]}
-                  >
-                    <Text
-                      style={[
-                        styles.modalKbjvValue,
-                        { color: colors.label, fontVariant: ["tabular-nums"] },
-                      ]}
-                    >
-                      {selectedItem.result.carbs}г
-                    </Text>
-                    <Text
-                      style={[
-                        styles.modalKbjvLabel,
-                        { color: colors.secondaryLabel },
-                      ]}
-                    >
-                      Вуглеводи
-                    </Text>
-                  </View>
-                </View>
-
-                <Text style={[styles.subSectionTitle, { color: colors.label }]}>
-                  Інгредієнти страви
-                </Text>
-                <View
-                  style={[
-                    styles.ingredientsCard,
-                    {
-                      backgroundColor: colors.secondarySystemGroupedBackground,
-                      borderColor: colors.separator,
-                    },
-                  ]}
-                >
-                  {selectedItem.result.ingredients.map((ing, idx) => (
-                    <View
-                      key={idx}
-                      style={[
-                        styles.ingredientRow,
-                        { borderBottomColor: colors.separator },
-                      ]}
-                    >
-                      <Text
-                        style={[styles.ingredientName, { color: colors.label }]}
-                      >
-                        • {ing.name}
-                      </Text>
-                      <Text
-                        style={[
-                          styles.ingredientWeight,
-                          { color: colors.accent },
-                        ]}
-                      >
-                        {ing.weight}
-                      </Text>
-                    </View>
-                  ))}
-                </View>
-
-                <Text style={[styles.subSectionTitle, { color: colors.label }]}>
-                  Чому це корисно
-                </Text>
-                <View
-                  style={[
-                    styles.insightCard,
-                    styles.goodInsightBorder,
-                    {
-                      backgroundColor: colors.secondarySystemGroupedBackground,
-                    },
-                  ]}
-                >
-                  <NativeIcon
-                    sf="checkmark.circle.fill"
-                    ion="checkmark-circle-outline"
-                    size={20}
-                    color={colors.accent}
-                  />
-                  <Text
-                    style={[styles.insightText, { color: colors.label }]}
-                    selectable
-                  >
-                    {selectedItem.result.whatIsGood}
-                  </Text>
-                </View>
-
-                <Text style={[styles.subSectionTitle, { color: colors.label }]}>
-                  Застереження та ризики
-                </Text>
-                <View
-                  style={[
-                    styles.insightCard,
-                    styles.riskInsightBorder,
-                    {
-                      backgroundColor: colors.secondarySystemGroupedBackground,
-                    },
-                  ]}
-                >
-                  <NativeIcon
-                    sf="exclamationmark.triangle.fill"
-                    ion="warning-outline"
-                    size={20}
-                    color={colors.systemOrange}
-                  />
-                  <Text
-                    style={[styles.insightText, { color: colors.label }]}
-                    selectable
-                  >
-                    {selectedItem.result.risks}
-                  </Text>
-                </View>
-
-                <Text style={[styles.subSectionTitle, { color: colors.label }]}>
-                  Загальний висновок
-                </Text>
-                <View
-                  style={[
-                    styles.summaryCard,
-                    {
-                      backgroundColor: colors.secondarySystemGroupedBackground,
-                      borderColor: colors.separator,
-                    },
-                  ]}
-                >
-                  <Text
-                    style={[styles.summaryText, { color: colors.label }]}
-                    selectable
-                  >
-                    {selectedItem.result.summary}
-                  </Text>
-                </View>
+                <ScanResultCard result={selectedItem.result} />
 
                 {selectedItem.correctionHistory &&
                   selectedItem.correctionHistory.length > 0 && (

@@ -8,10 +8,10 @@ export interface Ingredient {
 
 export interface ScanResult {
   foodName: string;
-  calories: number;
-  protein: number;
-  fat: number;
-  carbs: number;
+  calories: number | null;
+  protein: number | null;
+  fat: number | null;
+  carbs: number | null;
   ingredients: Ingredient[];
   whatIsGood: string;
   risks: string;

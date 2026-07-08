@@ -1,6 +1,5 @@
-import React from "react";
 import Ionicons from "@react-native-vector-icons/ionicons";
-
+import React from "react";
 import { ColorValue } from "react-native";
 
 interface NativeIconProps {
@@ -11,13 +10,11 @@ interface NativeIconProps {
   style?: any;
 }
 
-export default function NativeIcon({ ion, size = 24, color, style }: NativeIconProps) {
-  return (
-    <Ionicons
-      name={ion as any}
-      size={size}
-      color={color}
-      style={style}
-    />
-  );
+export default function NativeIcon({
+  ion,
+  size = 24,
+  color,
+  style,
+}: NativeIconProps) {
+  return <Ionicons name={ion as any} size={size} color={color} style={style} />;
 }

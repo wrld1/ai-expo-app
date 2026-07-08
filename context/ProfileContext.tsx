@@ -6,14 +6,12 @@ export interface ProfileData {
   gender: string;
   allergies: string[];
   concerns: string[];
-  geminiApiKey: string;
 }
 
 interface ProfileContextType {
   profile: ProfileData;
   isLoading: boolean;
   updateProfile: (updates: Partial<ProfileData>) => Promise<void>;
-  getEffectiveApiKey: () => string;
 }
 
 const defaultProfile: ProfileData = {
@@ -21,7 +19,6 @@ const defaultProfile: ProfileData = {
   gender: "",
   allergies: [],
   concerns: [],
-  geminiApiKey: "",
 };
 
 const ProfileContext = createContext<ProfileContextType | undefined>(undefined);
@@ -65,17 +62,8 @@ export const ProfileProvider: React.FC<{ children: React.ReactNode }> = ({
     }
   };
 
-  const getEffectiveApiKey = () => {
-    if (profile.geminiApiKey && profile.geminiApiKey.trim() !== "") {
-      return profile.geminiApiKey.trim();
-    }
-    return process.env.EXPO_PUBLIC_GEMINI_API_KEY || "";
-  };
-
   return (
-    <ProfileContext.Provider
-      value={{ profile, isLoading, updateProfile, getEffectiveApiKey }}
-    >
+    <ProfileContext.Provider value={{ profile, isLoading, updateProfile }}>
       {children}
     </ProfileContext.Provider>
   );

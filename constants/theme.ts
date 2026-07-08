@@ -1,56 +1,55 @@
-import { Platform, PlatformColor, ColorValue, StyleSheet } from "react-native";
+import { ThemeColors } from "@/types/theme";
+import { ColorValue, Platform, PlatformColor, StyleSheet } from "react-native";
 
-export interface ThemeColors {
-  label: ColorValue;
-  secondaryLabel: ColorValue;
-  systemBackground: ColorValue;
-  secondarySystemGroupedBackground: ColorValue;
-  separator: ColorValue;
-  accent: ColorValue;
-  systemRed: ColorValue;
-  systemOrange: ColorValue;
-  placeholder: string;
-}
+const safePlatformColor = (colorName: string, fallback: string): ColorValue => {
+  if (Platform.OS === "web") {
+    return fallback;
+  }
+  return PlatformColor(colorName);
+};
 
 export const colors: ThemeColors = {
   label: Platform.select<ColorValue>({
-    ios: PlatformColor("label"),
-    android: PlatformColor("?attr/colorOnSurface"),
+    ios: safePlatformColor("label", "#FFFFFF"),
+    android: safePlatformColor("?attr/colorOnSurface", "#FFFFFF"),
     default: "#FFFFFF",
   })!,
   secondaryLabel: Platform.select<ColorValue>({
-    ios: PlatformColor("secondaryLabel"),
-    android: PlatformColor("?attr/colorOnSurfaceVariant"),
+    ios: safePlatformColor("secondaryLabel", "#8E8E93"),
+    android: safePlatformColor("?attr/colorOnSurfaceVariant", "#8E8E93"),
     default: "#8E8E93",
   })!,
   systemBackground: Platform.select<ColorValue>({
-    ios: PlatformColor("systemBackground"),
-    android: PlatformColor("?attr/colorBackground"),
+    ios: safePlatformColor("systemBackground", "#121417"),
+    android: safePlatformColor("?attr/colorBackground", "#121417"),
     default: "#121417",
   })!,
   secondarySystemGroupedBackground: Platform.select<ColorValue>({
-    ios: PlatformColor("secondarySystemGroupedBackground"),
-    android: PlatformColor("?attr/colorSurfaceContainer"),
+    ios: safePlatformColor("secondarySystemGroupedBackground", "#1C1C1E"),
+    android: safePlatformColor("?attr/colorSurfaceContainer", "#1C1C1E"),
     default: "#1C1C1E",
   })!,
   separator: Platform.select<ColorValue>({
-    ios: PlatformColor("separator"),
-    android: PlatformColor("?attr/colorOutlineVariant"),
+    ios: safePlatformColor("separator", "rgba(255,255,255,0.08)"),
+    android: safePlatformColor(
+      "?attr/colorOutlineVariant",
+      "rgba(255,255,255,0.08)",
+    ),
     default: "rgba(255,255,255,0.08)",
   })!,
   accent: Platform.select<ColorValue>({
-    ios: PlatformColor("systemGreen"),
-    android: PlatformColor("?attr/colorPrimary"),
+    ios: safePlatformColor("systemGreen", "#2CE2A2"),
+    android: safePlatformColor("?attr/colorPrimary", "#2CE2A2"),
     default: "#2CE2A2",
   })!,
   systemRed: Platform.select<ColorValue>({
-    ios: PlatformColor("systemRed"),
-    android: PlatformColor("?attr/colorError"),
+    ios: safePlatformColor("systemRed", "#FF453A"),
+    android: safePlatformColor("?attr/colorError", "#FF453A"),
     default: "#FF453A",
   })!,
   systemOrange: Platform.select<ColorValue>({
-    ios: PlatformColor("systemOrange"),
-    android: PlatformColor("?attr/colorTertiary"),
+    ios: safePlatformColor("systemOrange", "#FF9500"),
+    android: safePlatformColor("?attr/colorTertiary", "#FF9500"),
     default: "#FF9500",
   })!,
   placeholder: "#6B7280",
@@ -58,14 +57,20 @@ export const colors: ThemeColors = {
 
 export const nativeStyles = StyleSheet.create({
   card: {
-    borderRadius: 12,
-    borderWidth: 1,
+    borderRadius: 10,
     ...Platform.select({
       ios: {
         borderCurve: "continuous",
+        borderWidth: 0,
       },
       android: {
+        borderWidth: 1,
+        borderColor: "rgba(255,255,255,0.08)",
         elevation: 2,
+      },
+      default: {
+        borderWidth: 1,
+        borderColor: "rgba(255,255,255,0.08)",
       },
     }),
   },

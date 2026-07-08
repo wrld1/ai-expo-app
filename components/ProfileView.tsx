@@ -1,6 +1,8 @@
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Picker } from "@react-native-picker/picker";
 import Ionicons from "@react-native-vector-icons/ionicons";
-import * as Haptics from "expo-haptics";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
+import { useForm } from "react-hook-form";
 import {
   Alert,
   KeyboardAvoidingView,
@@ -12,8 +14,24 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import * as z from "zod";
+
 import { colors } from "../constants/theme";
 import { useProfile } from "../context/ProfileContext";
+import {
+  triggerHapticError,
+  triggerHapticLight,
+  triggerHapticSuccess,
+} from "../utils/haptics";
+
+const profileSchema = z.object({
+  age: z.string().min(1, "Вік обов'язковий"),
+  gender: z.string(),
+  allergies: z.array(z.string()),
+  concerns: z.array(z.string()),
+});
+
+type ProfileFormData = z.infer<typeof profileSchema>;
 
 const ALLERGY_PRESETS = [
   "Лактоза",
@@ -34,78 +52,192 @@ const CONCERN_PRESETS = [
   "Загальний тонус",
 ];
 
+// --- Sub-components for cleaner JSX ---
+
+function FormSection({
+  title,
+  children,
+}: {
+  title: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <View style={styles.sectionContainer}>
+      <Text style={[styles.groupHeader, { color: colors.secondaryLabel }]}>
+        {title}
+      </Text>
+      <View
+        style={[
+          styles.groupedCard,
+          { backgroundColor: colors.secondarySystemGroupedBackground },
+        ]}
+      >
+        {children}
+      </View>
+    </View>
+  );
+}
+
+function Divider() {
+  return (
+    <View style={[styles.divider, { backgroundColor: colors.separator }]} />
+  );
+}
+
+function SettingsRow({
+  label,
+  value,
+  onPress,
+  children,
+  style,
+}: {
+  label?: string;
+  value?: string;
+  onPress?: () => void;
+  children?: React.ReactNode;
+  style?: object;
+}) {
+  const content = (
+    <View style={[styles.row, style]}>
+      {label && (
+        <Text style={[styles.rowLabel, { color: colors.label }]}>{label}</Text>
+      )}
+      {value && (
+        <Text style={[styles.rowValueText, { color: colors.secondaryLabel }]}>
+          {value}
+        </Text>
+      )}
+      {children}
+    </View>
+  );
+
+  if (onPress) {
+    return (
+      <TouchableOpacity onPress={onPress} activeOpacity={0.7}>
+        {content}
+      </TouchableOpacity>
+    );
+  }
+  return content;
+}
+
+function ChipsGroup({
+  presets,
+  selectedValues,
+  onToggle,
+}: {
+  presets: string[];
+  selectedValues: string[];
+  onToggle: (val: string) => void;
+}) {
+  return (
+    <View style={styles.chipsRow}>
+      {presets.map((item) => {
+        const isSelected = selectedValues.includes(item);
+        return (
+          <TouchableOpacity
+            key={item}
+            style={[
+              styles.chip,
+              isSelected && [
+                styles.chipSelected,
+                { borderColor: colors.accent },
+              ],
+            ]}
+            onPress={() => onToggle(item)}
+            activeOpacity={0.8}
+          >
+            <Text
+              style={[
+                styles.chipText,
+                isSelected && [
+                  styles.chipTextSelected,
+                  { color: colors.accent },
+                ],
+              ]}
+            >
+              {item}
+            </Text>
+          </TouchableOpacity>
+        );
+      })}
+    </View>
+  );
+}
+
 export default function ProfileView() {
   const { profile, updateProfile } = useProfile();
-
-  const [age, setAge] = useState(profile.age);
-  const [gender, setGender] = useState(profile.gender);
-  const [allergies, setAllergies] = useState<string[]>(profile.allergies);
-  const [concerns, setConcerns] = useState<string[]>(profile.concerns);
-  const [geminiApiKey, setGeminiApiKey] = useState(profile.geminiApiKey);
+  const [showAgePicker, setShowAgePicker] = useState(false);
   const [customAllergy, setCustomAllergy] = useState("");
-  const [showApiKey, setShowApiKey] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
 
-  const triggerHaptic = () => {
-    if (Platform.OS === "ios") {
-      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => {});
-    }
-  };
+  const { control, handleSubmit, setValue, watch, reset } =
+    useForm<ProfileFormData>({
+      resolver: zodResolver(profileSchema),
+      defaultValues: {
+        age: "25",
+        gender: "Інша",
+        allergies: [],
+        concerns: [],
+      },
+    });
+
+  useEffect(() => {
+    reset({
+      age: profile.age || "25",
+      gender: profile.gender || "Інша",
+      allergies: profile.allergies || [],
+      concerns: profile.concerns || [],
+    });
+  }, [profile, reset]);
+
+  const age = watch("age");
+  const gender = watch("gender");
+  const allergies = watch("allergies") || [];
+  const concerns = watch("concerns") || [];
 
   const toggleAllergy = (allergy: string) => {
-    triggerHaptic();
-    if (allergies.includes(allergy)) {
-      setAllergies(allergies.filter((a) => a !== allergy));
-    } else {
-      setAllergies([...allergies, allergy]);
-    }
+    triggerHapticLight();
+    const updated = allergies.includes(allergy)
+      ? allergies.filter((a) => a !== allergy)
+      : [...allergies, allergy];
+    setValue("allergies", updated, { shouldDirty: true });
   };
 
   const addCustomAllergy = () => {
     const trimmed = customAllergy.trim();
     if (trimmed && !allergies.includes(trimmed)) {
-      triggerHaptic();
-      setAllergies([...allergies, trimmed]);
+      triggerHapticLight();
+      setValue("allergies", [...allergies, trimmed], { shouldDirty: true });
       setCustomAllergy("");
     }
   };
 
   const removeAllergy = (allergy: string) => {
-    triggerHaptic();
-    setAllergies(allergies.filter((a) => a !== allergy));
+    triggerHapticLight();
+    setValue(
+      "allergies",
+      allergies.filter((a) => a !== allergy),
+      { shouldDirty: true },
+    );
   };
 
   const toggleConcern = (concern: string) => {
-    triggerHaptic();
-    if (concerns.includes(concern)) {
-      setConcerns(concerns.filter((c) => c !== concern));
-    } else {
-      setConcerns([...concerns, concern]);
-    }
+    triggerHapticLight();
+    const updated = concerns.includes(concern)
+      ? concerns.filter((c) => c !== concern)
+      : [...concerns, concern];
+    setValue("concerns", updated, { shouldDirty: true });
   };
 
-  const handleSave = async () => {
+  const handleSave = async (data: ProfileFormData) => {
     setIsSaving(true);
-    if (Platform.OS === "ios") {
-      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success).catch(
-        () => {},
-      );
-    }
+    triggerHapticSuccess();
     try {
-      await updateProfile({
-        age,
-        gender,
-        allergies,
-        concerns,
-        geminiApiKey,
-      });
+      await updateProfile(data);
       Alert.alert("Успіх", "Профіль успішно збережено!");
     } catch {
-      if (Platform.OS === "ios") {
-        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error).catch(
-          () => {},
-        );
-      }
+      triggerHapticError();
       Alert.alert("Помилка", "Не вдалося зберегти профіль");
     } finally {
       setIsSaving(false);
@@ -118,40 +250,71 @@ export default function ProfileView() {
     <KeyboardAvoidingView
       behavior={Platform.OS === "ios" ? "padding" : "height"}
       style={[styles.container, { backgroundColor: colors.systemBackground }]}
+      keyboardVerticalOffset={Platform.OS === "ios" ? 88 : 0}
     >
       <ScrollView
         contentInsetAdjustmentBehavior="automatic"
         contentContainerStyle={styles.scrollContent}
       >
-        <Text style={[styles.groupHeader, { color: colors.secondaryLabel }]}>
-          Персональні дані
-        </Text>
-        <View
-          style={[
-            styles.groupedCard,
-            { backgroundColor: colors.secondarySystemGroupedBackground },
-          ]}
-        >
-          <View style={styles.row}>
-            <Text style={[styles.rowLabel, { color: colors.label }]}>Вік</Text>
-            <TextInput
-              style={[styles.rowValueInput, { color: colors.label }]}
-              value={age}
-              onChangeText={setAge}
-              placeholder="Введіть вік"
-              placeholderTextColor={colors.placeholder}
-              keyboardType="number-pad"
-              textAlign="right"
+        <FormSection title="ПЕРСОНАЛЬНІ ДАНІ">
+          {Platform.OS === "ios" ? (
+            <SettingsRow
+              label="Вік"
+              value={`${age} років`}
+              onPress={() => {
+                triggerHapticLight();
+                setShowAgePicker(!showAgePicker);
+              }}
             />
-          </View>
-          <View
-            style={[styles.divider, { backgroundColor: colors.separator }]}
-          />
+          ) : (
+            <SettingsRow label="Вік">
+              <View style={styles.pickerWrapperAndroid}>
+                <Picker
+                  selectedValue={age}
+                  onValueChange={(itemValue) =>
+                    setValue("age", itemValue, { shouldDirty: true })
+                  }
+                  style={{ color: colors.label, width: 140 }}
+                  dropdownIconColor={colors.secondaryLabel as string}
+                  mode="dropdown"
+                >
+                  {Array.from({ length: 100 }, (_, i) => String(i + 1)).map(
+                    (val) => (
+                      <Picker.Item
+                        key={val}
+                        label={`${val} р.`}
+                        value={val}
+                        color="#1C1C1E"
+                      />
+                    ),
+                  )}
+                </Picker>
+              </View>
+            </SettingsRow>
+          )}
 
-          <View style={[styles.row, { paddingVertical: 8 }]}>
-            <Text style={[styles.rowLabel, { color: colors.label }]}>
-              Стать
-            </Text>
+          {Platform.OS === "ios" && showAgePicker && (
+            <View style={styles.pickerContainer}>
+              <Picker
+                selectedValue={age}
+                onValueChange={(itemValue) => {
+                  triggerHapticLight();
+                  setValue("age", itemValue, { shouldDirty: true });
+                }}
+                style={{ color: colors.label }}
+              >
+                {Array.from({ length: 100 }, (_, i) => String(i + 1)).map(
+                  (val) => (
+                    <Picker.Item key={val} label={`${val} років`} value={val} />
+                  ),
+                )}
+              </Picker>
+            </View>
+          )}
+
+          <Divider />
+
+          <SettingsRow label="Стать" style={{ paddingVertical: 8 }}>
             <View style={styles.segmentedControl}>
               {["Чоловіча", "Жіноча", "Інша"].map((g, idx) => {
                 const isSelected = gender === g;
@@ -165,8 +328,8 @@ export default function ProfileView() {
                       idx === 2 && styles.segmentButtonRight,
                     ]}
                     onPress={() => {
-                      triggerHaptic();
-                      setGender(g);
+                      triggerHapticLight();
+                      setValue("gender", g, { shouldDirty: true });
                     }}
                     activeOpacity={0.8}
                   >
@@ -182,70 +345,24 @@ export default function ProfileView() {
                 );
               })}
             </View>
-          </View>
-        </View>
+          </SettingsRow>
+        </FormSection>
 
-        <Text style={[styles.groupHeader, { color: colors.secondaryLabel }]}>
-          Алергії та обмеження
-        </Text>
-        <View
-          style={[
-            styles.groupedCard,
-            { backgroundColor: colors.secondarySystemGroupedBackground },
-          ]}
-        >
-          <View
-            style={[
-              styles.row,
-              {
-                flexDirection: "column",
-                alignItems: "stretch",
-                paddingVertical: 12,
-              },
-            ]}
-          >
+        <FormSection title="АЛЕРГІЇ ТА ОБМЕЖЕННЯ">
+          <View style={styles.chipsContainerRow}>
             <Text style={[styles.rowSubText, { color: colors.secondaryLabel }]}>
               Оберіть алергени для попередження про ризики страви:
             </Text>
-
-            <View style={styles.chipsRow}>
-              {ALLERGY_PRESETS.map((allergy) => {
-                const isSelected = allergies.includes(allergy);
-                return (
-                  <TouchableOpacity
-                    key={allergy}
-                    style={[
-                      styles.chip,
-                      isSelected && [
-                        styles.chipSelected,
-                        { borderColor: colors.accent },
-                      ],
-                    ]}
-                    onPress={() => toggleAllergy(allergy)}
-                    activeOpacity={0.8}
-                  >
-                    <Text
-                      style={[
-                        styles.chipText,
-                        isSelected && [
-                          styles.chipTextSelected,
-                          { color: colors.accent },
-                        ],
-                      ]}
-                    >
-                      {allergy}
-                    </Text>
-                  </TouchableOpacity>
-                );
-              })}
-            </View>
+            <ChipsGroup
+              presets={ALLERGY_PRESETS}
+              selectedValues={allergies}
+              onToggle={toggleAllergy}
+            />
           </View>
 
-          <View
-            style={[styles.divider, { backgroundColor: colors.separator }]}
-          />
+          <Divider />
 
-          <View style={styles.row}>
+          <SettingsRow>
             <TextInput
               style={[styles.customInput, { color: colors.label }]}
               value={customAllergy}
@@ -260,23 +377,12 @@ export default function ProfileView() {
             >
               <Ionicons name="add" size={20} color="#121417" />
             </TouchableOpacity>
-          </View>
+          </SettingsRow>
 
           {allergies.filter((a) => !ALLERGY_PRESETS.includes(a)).length > 0 && (
             <>
-              <View
-                style={[styles.divider, { backgroundColor: colors.separator }]}
-              />
-              <View
-                style={[
-                  styles.row,
-                  {
-                    flexDirection: "column",
-                    alignItems: "stretch",
-                    paddingVertical: 12,
-                  },
-                ]}
-              >
+              <Divider />
+              <View style={styles.chipsContainerRow}>
                 <Text
                   style={[styles.rowSubLabel, { color: colors.secondaryLabel }]}
                 >
@@ -307,7 +413,7 @@ export default function ProfileView() {
                           <Ionicons
                             name="close-circle"
                             size={16}
-                            color={colors.systemRed as any}
+                            color={colors.systemRed}
                             style={{ marginLeft: 4 }}
                           />
                         </TouchableOpacity>
@@ -317,102 +423,20 @@ export default function ProfileView() {
               </View>
             </>
           )}
-        </View>
+        </FormSection>
 
-        <Text style={[styles.groupHeader, { color: colors.secondaryLabel }]}>
-          Цілі та симптоми
-        </Text>
-        <View
-          style={[
-            styles.groupedCard,
-            { backgroundColor: colors.secondarySystemGroupedBackground },
-          ]}
-        >
-          <View
-            style={[
-              styles.row,
-              {
-                flexDirection: "column",
-                alignItems: "stretch",
-                paddingVertical: 12,
-              },
-            ]}
-          >
+        <FormSection title="ЦІЛІ ТА СИМПТОМИ">
+          <View style={styles.chipsContainerRow}>
             <Text style={[styles.rowSubText, { color: colors.secondaryLabel }]}>
               На чому сфокусувати увагу AI при аналізі?
             </Text>
-
-            <View style={styles.chipsRow}>
-              {CONCERN_PRESETS.map((concern) => {
-                const isSelected = concerns.includes(concern);
-                return (
-                  <TouchableOpacity
-                    key={concern}
-                    style={[
-                      styles.chip,
-                      isSelected && [
-                        styles.chipSelected,
-                        { borderColor: colors.accent },
-                      ],
-                    ]}
-                    onPress={() => toggleConcern(concern)}
-                    activeOpacity={0.8}
-                  >
-                    <Text
-                      style={[
-                        styles.chipText,
-                        isSelected && [
-                          styles.chipTextSelected,
-                          { color: colors.accent },
-                        ],
-                      ]}
-                    >
-                      {concern}
-                    </Text>
-                  </TouchableOpacity>
-                );
-              })}
-            </View>
+            <ChipsGroup
+              presets={CONCERN_PRESETS}
+              selectedValues={concerns}
+              onToggle={toggleConcern}
+            />
           </View>
-        </View>
-
-        <Text style={[styles.groupHeader, { color: colors.secondaryLabel }]}>
-          AI Конфігурація
-        </Text>
-        <View
-          style={[
-            styles.groupedCard,
-            { backgroundColor: colors.secondarySystemGroupedBackground },
-          ]}
-        >
-          <View style={styles.row}>
-            <Text style={[styles.rowLabel, { color: colors.label }]}>
-              API Key
-            </Text>
-            <View style={styles.apiKeyContainer}>
-              <TextInput
-                style={[styles.apiKeyInput, { color: colors.label }]}
-                value={geminiApiKey}
-                onChangeText={setGeminiApiKey}
-                placeholder="Введіть Gemini Key"
-                placeholderTextColor={colors.placeholder}
-                secureTextEntry={!showApiKey}
-                autoCapitalize="none"
-                autoCorrect={false}
-              />
-              <TouchableOpacity
-                onPress={() => setShowApiKey(!showApiKey)}
-                style={styles.eyeBtn}
-              >
-                <Ionicons
-                  name={showApiKey ? "eye-off-outline" : "eye-outline"}
-                  size={18}
-                  color={colors.secondaryLabel as any}
-                />
-              </TouchableOpacity>
-            </View>
-          </View>
-        </View>
+        </FormSection>
 
         <Text style={[styles.cardFooterText, { color: colors.secondaryLabel }]}>
           {isEnvKeyLoaded
@@ -422,7 +446,7 @@ export default function ProfileView() {
 
         <TouchableOpacity
           style={[styles.saveBtn, { backgroundColor: colors.accent }]}
-          onPress={handleSave}
+          onPress={handleSubmit(handleSave)}
           disabled={isSaving}
           activeOpacity={0.85}
         >
@@ -443,20 +467,22 @@ const styles = StyleSheet.create({
     padding: 16,
     paddingBottom: 40,
   },
+  sectionContainer: {
+    marginBottom: 20,
+  },
   groupHeader: {
-    fontSize: 12,
-    fontWeight: "600",
-    marginLeft: 12,
+    fontSize: 13,
+    fontWeight: "400",
+    marginLeft: 16,
     marginBottom: 8,
     marginTop: 10,
     textTransform: "uppercase",
   },
   groupedCard: {
-    borderRadius: 12,
+    borderRadius: 14,
     borderCurve: "continuous",
     paddingHorizontal: 16,
-    marginBottom: 16,
-    boxShadow: "0 1px 2px rgba(0,0,0,0.05)",
+    overflow: "hidden",
   },
   row: {
     flexDirection: "row",
@@ -465,17 +491,22 @@ const styles = StyleSheet.create({
     paddingVertical: 14,
     minHeight: 48,
   },
+  chipsContainerRow: {
+    flexDirection: "column",
+    alignItems: "stretch",
+    paddingVertical: 14,
+  },
   divider: {
     height: StyleSheet.hairlineWidth,
     width: "100%",
   },
   rowLabel: {
     fontSize: 16,
-    fontWeight: "500",
+    fontWeight: "400",
   },
   rowSubLabel: {
     fontSize: 14,
-    fontWeight: "600",
+    fontWeight: "500",
     marginBottom: 8,
   },
   rowSubText: {
@@ -483,11 +514,22 @@ const styles = StyleSheet.create({
     lineHeight: 18,
     marginBottom: 12,
   },
-  rowValueInput: {
-    flex: 1,
+  rowValueText: {
     fontSize: 16,
-    paddingVertical: 0,
-    marginLeft: 20,
+  },
+  pickerWrapperAndroid: {
+    marginRight: -10,
+  },
+  pickerContainer: {
+    ...Platform.select({
+      ios: {
+        backgroundColor: "rgba(255, 255, 255, 0.02)",
+        marginTop: -6,
+        marginBottom: 8,
+        borderRadius: 8,
+        overflow: "hidden",
+      },
+    }),
   },
   segmentedControl: {
     flexDirection: "row",
@@ -588,13 +630,13 @@ const styles = StyleSheet.create({
     padding: 4,
   },
   cardFooterText: {
-    fontSize: 11,
+    fontSize: 12,
     marginLeft: 16,
     marginTop: -8,
     marginBottom: 20,
   },
   saveBtn: {
-    borderRadius: 12,
+    borderRadius: 14,
     borderCurve: "continuous",
     paddingVertical: 14,
     alignItems: "center",
@@ -605,6 +647,6 @@ const styles = StyleSheet.create({
   saveBtnText: {
     color: "#121417",
     fontSize: 16,
-    fontWeight: "700",
+    fontWeight: "600",
   },
 });

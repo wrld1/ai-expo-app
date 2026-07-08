@@ -1,4 +1,3 @@
-import * as Haptics from "expo-haptics";
 import { Image } from "expo-image";
 import * as ImagePicker from "expo-image-picker";
 import { useRouter } from "expo-router";
@@ -20,14 +19,21 @@ import Animated, {
   FadeOutDown,
   LayoutAnimationConfig,
 } from "react-native-reanimated";
+import { analyzeFoodImageBackend } from "../api/analyze";
+import { colors } from "../constants/theme";
 import { ScanResult, useHistory } from "../context/HistoryContext";
 import { useProfile } from "../context/ProfileContext";
-import { analyzeFoodImage } from "../services/gemini";
+import {
+  triggerHapticError,
+  triggerHapticLight,
+  triggerHapticMedium,
+  triggerHapticSuccess,
+} from "../utils/haptics";
 import NativeIcon from "./NativeIcon";
-import { colors } from "../constants/theme";
+import ScanResultCard from "./ScanResultCard";
 
 export default function ScanView() {
-  const { profile, getEffectiveApiKey } = useProfile();
+  const { profile } = useProfile();
   const { addHistoryItem, updateHistoryItemResult } = useHistory();
   const router = useRouter();
 
@@ -39,32 +45,6 @@ export default function ScanView() {
   const [isCorrecting, setIsCorrecting] = useState(false);
 
   const isProfileIncomplete = !profile.age || !profile.gender;
-  const apiKey = getEffectiveApiKey();
-  const isApiKeyMissing = !apiKey || apiKey.trim() === "";
-
-  const triggerHaptic = (
-    style: Haptics.ImpactFeedbackStyle = Haptics.ImpactFeedbackStyle.Light,
-  ) => {
-    if (Platform.OS === "ios") {
-      Haptics.impactAsync(style).catch(() => {});
-    }
-  };
-
-  const triggerSuccessHaptic = () => {
-    if (Platform.OS === "ios") {
-      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success).catch(
-        () => {},
-      );
-    }
-  };
-
-  const triggerErrorHaptic = () => {
-    if (Platform.OS === "ios") {
-      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error).catch(
-        () => {},
-      );
-    }
-  };
 
   const requestPermissions = async () => {
     if (Platform.OS !== "web") {
@@ -77,11 +57,11 @@ export default function ScanView() {
   };
 
   const handleTakePhoto = async () => {
-    triggerHaptic();
+    triggerHapticLight();
     try {
       const hasPermission = await requestPermissions();
       if (!hasPermission) {
-        triggerErrorHaptic();
+        triggerHapticError();
         Alert.alert(
           "Доступ обмежено",
           "Будь ласка, дозвольте доступ до камери та галереї у налаштуваннях пристрою.",
@@ -96,7 +76,7 @@ export default function ScanView() {
       });
 
       if (!result.canceled && result.assets && result.assets.length > 0) {
-        triggerSuccessHaptic();
+        triggerHapticSuccess();
         setImageUri(result.assets[0].uri);
         setScanResult(null);
         setHistoryId(null);
@@ -104,17 +84,17 @@ export default function ScanView() {
       }
     } catch (error) {
       console.error("Camera capture failed", error);
-      triggerErrorHaptic();
+      triggerHapticError();
       Alert.alert("Помилка", "Не вдалося відкрити камеру.");
     }
   };
 
   const handlePickImage = async () => {
-    triggerHaptic();
+    triggerHapticLight();
     try {
       const hasPermission = await requestPermissions();
       if (!hasPermission) {
-        triggerErrorHaptic();
+        triggerHapticError();
         Alert.alert(
           "Доступ обмежено",
           "Будь ласка, дозвольте доступ до камери та галереї у налаштуваннях пристрою.",
@@ -129,7 +109,7 @@ export default function ScanView() {
       });
 
       if (!result.canceled && result.assets && result.assets.length > 0) {
-        triggerSuccessHaptic();
+        triggerHapticSuccess();
         setImageUri(result.assets[0].uri);
         setScanResult(null);
         setHistoryId(null);
@@ -137,40 +117,25 @@ export default function ScanView() {
       }
     } catch (error) {
       console.error("Gallery picker failed", error);
-      triggerErrorHaptic();
+      triggerHapticError();
       Alert.alert("Помилка", "Не вдалося відкрити галерею.");
     }
   };
 
   const handleAnalyze = async () => {
     if (!imageUri) return;
-    if (isApiKeyMissing) {
-      triggerErrorHaptic();
-      Alert.alert(
-        "Відсутній API Key",
-        "Для роботи аналітика потрібен Gemini API Key. Введіть його у вкладці 'Профіль'.",
-        [
-          { text: "Скасувати", style: "cancel" },
-          {
-            text: "Перейти до профілю",
-            onPress: () => router.push("/profile" as any),
-          },
-        ],
-      );
-      return;
-    }
 
-    triggerHaptic(Haptics.ImpactFeedbackStyle.Medium);
+    triggerHapticMedium();
     setIsAnalyzing(true);
     try {
-      const result = await analyzeFoodImage(imageUri, profile, apiKey);
+      const result = await analyzeFoodImageBackend(imageUri, profile);
       setScanResult(result);
 
       const savedItem = await addHistoryItem(imageUri, result);
       setHistoryId(savedItem.id);
-      triggerSuccessHaptic();
+      triggerHapticSuccess();
     } catch (error: any) {
-      triggerErrorHaptic();
+      triggerHapticError();
       Alert.alert(
         "Помилка аналізу",
         error.message || "Сталася невідома помилка.",
@@ -183,17 +148,14 @@ export default function ScanView() {
   const handleCorrection = async () => {
     if (!imageUri || !scanResult || !historyId || !correctionText.trim())
       return;
-    if (isApiKeyMissing) return;
 
-    triggerHaptic(Haptics.ImpactFeedbackStyle.Medium);
+    triggerHapticMedium();
     setIsCorrecting(true);
     try {
-      const updatedResult = await analyzeFoodImage(
+      const updatedResult = await analyzeFoodImageBackend(
         imageUri,
         profile,
-        apiKey,
         correctionText.trim(),
-        scanResult,
       );
 
       setScanResult(updatedResult);
@@ -203,10 +165,10 @@ export default function ScanView() {
         correctionText.trim(),
       );
       setCorrectionText("");
-      triggerSuccessHaptic();
+      triggerHapticSuccess();
       Alert.alert("Успіх", "Аналіз страви успішно оновлено!");
     } catch (error: any) {
-      triggerErrorHaptic();
+      triggerHapticError();
       Alert.alert(
         "Помилка оновлення",
         error.message || "Не вдалося оновити аналіз.",
@@ -217,49 +179,11 @@ export default function ScanView() {
   };
 
   const handleReset = () => {
-    triggerHaptic();
+    triggerHapticLight();
     setImageUri(null);
     setScanResult(null);
     setHistoryId(null);
     setCorrectionText("");
-  };
-
-  const renderMacroProgress = (
-    value: number,
-    total: number,
-    label: string,
-    color: string,
-    suffix: string = "г",
-  ) => {
-    const maxVal = total > 0 ? total : 100;
-    const progress = Math.min(value / maxVal, 1);
-
-    return (
-      <View style={styles.macroProgressContainer}>
-        <View style={styles.macroHeaderRow}>
-          <Text style={[styles.macroLabel, { color: colors.label }]}>
-            {label}
-          </Text>
-          <Text
-            style={[
-              styles.macroValue,
-              { color, fontVariant: ["tabular-nums"] },
-            ]}
-          >
-            {value}
-            {suffix}
-          </Text>
-        </View>
-        <View style={styles.macroTrack}>
-          <View
-            style={[
-              styles.macroBar,
-              { backgroundColor: color, width: `${progress * 100}%` },
-            ]}
-          />
-        </View>
-      </View>
-    );
   };
 
   return (
@@ -279,8 +203,8 @@ export default function ScanView() {
                 { backgroundColor: "rgba(44, 226, 162, 0.08)" },
               ]}
               onPress={() => {
-                triggerHaptic();
-                router.push("/profile" as any);
+                triggerHapticLight();
+                router.push("/profile");
               }}
               activeOpacity={0.8}
             >
@@ -457,188 +381,7 @@ export default function ScanView() {
                   entering={FadeInUp}
                   style={styles.resultsContainer}
                 >
-                  <View
-                    style={[
-                      styles.resultHeaderCard,
-                      {
-                        backgroundColor:
-                          colors.secondarySystemGroupedBackground,
-                      },
-                    ]}
-                  >
-                    <Text
-                      style={[
-                        styles.resultLabel,
-                        { color: colors.secondaryLabel },
-                      ]}
-                    >
-                      AI розпізнав страву:
-                    </Text>
-                    <Text
-                      style={[styles.resultFoodName, { color: colors.label }]}
-                      selectable
-                    >
-                      {scanResult.foodName}
-                    </Text>
-                  </View>
-
-                  <View
-                    style={[
-                      styles.resultsCard,
-                      {
-                        backgroundColor:
-                          colors.secondarySystemGroupedBackground,
-                      },
-                    ]}
-                  >
-                    <Text
-                      style={[styles.resultsCardTitle, { color: colors.label }]}
-                    >
-                      КБЖВ показники
-                    </Text>
-
-                    {renderMacroProgress(
-                      scanResult.calories,
-                      1000,
-                      "Калорійність",
-                      "#FF5252",
-                      " ккал",
-                    )}
-                    {renderMacroProgress(
-                      scanResult.protein,
-                      80,
-                      "Білки",
-                      "#4CAF50",
-                    )}
-                    {renderMacroProgress(scanResult.fat, 70, "Жири", "#FFC107")}
-                    {renderMacroProgress(
-                      scanResult.carbs,
-                      150,
-                      "Вуглеводи",
-                      "#00BCD4",
-                    )}
-                  </View>
-
-                  <View
-                    style={[
-                      styles.resultsCard,
-                      {
-                        backgroundColor:
-                          colors.secondarySystemGroupedBackground,
-                      },
-                    ]}
-                  >
-                    <Text
-                      style={[styles.resultsCardTitle, { color: colors.label }]}
-                    >
-                      Інгредієнти на тарілці
-                    </Text>
-                    {scanResult.ingredients.map((ing, idx) => (
-                      <View
-                        key={idx}
-                        style={[
-                          styles.ingredientRow,
-                          { borderBottomColor: colors.separator },
-                        ]}
-                      >
-                        <Text
-                          style={[
-                            styles.ingredientName,
-                            { color: colors.label },
-                          ]}
-                        >
-                          • {ing.name}
-                        </Text>
-                        <Text
-                          style={[
-                            styles.ingredientWeight,
-                            { color: colors.accent },
-                          ]}
-                        >
-                          {ing.weight}
-                        </Text>
-                      </View>
-                    ))}
-                  </View>
-
-                  <View
-                    style={[
-                      styles.resultsCard,
-                      {
-                        backgroundColor:
-                          colors.secondarySystemGroupedBackground,
-                      },
-                    ]}
-                  >
-                    <Text
-                      style={[styles.resultsCardTitle, { color: colors.label }]}
-                    >
-                      Персональний аналіз
-                    </Text>
-
-                    <Text
-                      style={[
-                        styles.subSectionLabel,
-                        { color: colors.secondaryLabel },
-                      ]}
-                    >
-                      Що чудово у цій страві:
-                    </Text>
-                    <View style={[styles.insightRow, styles.goodInsightBorder]}>
-                      <NativeIcon
-                        sf="checkmark.circle.fill"
-                        ion="checkmark-circle-outline"
-                        size={18}
-                        color={colors.accent}
-                      />
-                      <Text
-                        style={[styles.insightText, { color: colors.label }]}
-                        selectable
-                      >
-                        {scanResult.whatIsGood}
-                      </Text>
-                    </View>
-
-                    <Text
-                      style={[
-                        styles.subSectionLabel,
-                        { color: colors.secondaryLabel },
-                      ]}
-                    >
-                      Потенційні ризики для вас:
-                    </Text>
-                    <View style={[styles.insightRow, styles.riskInsightBorder]}>
-                      <NativeIcon
-                        sf="exclamationmark.triangle.fill"
-                        ion="warning-outline"
-                        size={18}
-                        color={colors.systemOrange}
-                      />
-                      <Text
-                        style={[styles.insightText, { color: colors.label }]}
-                        selectable
-                      >
-                        {scanResult.risks}
-                      </Text>
-                    </View>
-
-                    <Text
-                      style={[
-                        styles.subSectionLabel,
-                        { color: colors.secondaryLabel },
-                      ]}
-                    >
-                      Висновок дієтолога:
-                    </Text>
-                    <View style={styles.summaryBox}>
-                      <Text
-                        style={[styles.summaryText, { color: colors.label }]}
-                        selectable
-                      >
-                        {scanResult.summary}
-                      </Text>
-                    </View>
-                  </View>
+                  <ScanResultCard result={scanResult} />
 
                   <View style={styles.warningCard}>
                     <NativeIcon
