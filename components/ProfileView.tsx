@@ -16,7 +16,7 @@ import {
 } from "react-native";
 import * as z from "zod";
 
-import { colors } from "../constants/theme";
+import { colors, nativeStyles } from "../constants/theme";
 import { useProfile } from "../context/ProfileContext";
 import {
   triggerHapticError,
@@ -63,7 +63,7 @@ function FormSection({
 }) {
   return (
     <View style={styles.sectionContainer}>
-      <Text style={[styles.groupHeader, { color: colors.secondaryLabel }]}>
+      <Text style={[nativeStyles.sectionTitle, { color: colors.secondaryLabel, marginLeft: 16 }]}>
         {title}
       </Text>
       <View
@@ -460,14 +460,6 @@ const styles = StyleSheet.create({
   },
   sectionContainer: {
     marginBottom: 20,
-  },
-  groupHeader: {
-    fontSize: 13,
-    fontWeight: "400",
-    marginLeft: 16,
-    marginBottom: 8,
-    marginTop: 10,
-    textTransform: "uppercase",
   },
   groupedCard: {
     borderRadius: 14,

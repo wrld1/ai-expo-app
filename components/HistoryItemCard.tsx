@@ -66,17 +66,17 @@ export default function HistoryItemCard({
           <View style={styles.kbjvGrid}>
             <View style={styles.kbjvItem}>
               <Text
+                style={[styles.kbjvLabel, { color: colors.secondaryLabel }]}
+              >
+                ккал
+              </Text>
+              <Text
                 style={[
                   styles.kbjvValue,
                   { color: colors.label, fontVariant: ["tabular-nums"] },
                 ]}
               >
                 {result.calories}
-              </Text>
-              <Text
-                style={[styles.kbjvLabel, { color: colors.secondaryLabel }]}
-              >
-                ккал
               </Text>
             </View>
             <View
@@ -86,6 +86,11 @@ export default function HistoryItemCard({
               ]}
             />
             <View style={styles.kbjvItem}>
+              <Text
+                style={[styles.kbjvLabel, { color: colors.secondaryLabel }]}
+              >
+                Б
+              </Text>
               <Text
                 style={[
                   styles.kbjvValue,
@@ -94,11 +99,6 @@ export default function HistoryItemCard({
               >
                 {result.protein}г
               </Text>
-              <Text
-                style={[styles.kbjvLabel, { color: colors.secondaryLabel }]}
-              >
-                Б
-              </Text>
             </View>
             <View
               style={[
@@ -107,6 +107,11 @@ export default function HistoryItemCard({
               ]}
             />
             <View style={styles.kbjvItem}>
+              <Text
+                style={[styles.kbjvLabel, { color: colors.secondaryLabel }]}
+              >
+                Ж
+              </Text>
               <Text
                 style={[
                   styles.kbjvValue,
@@ -115,11 +120,6 @@ export default function HistoryItemCard({
               >
                 {result.fat}г
               </Text>
-              <Text
-                style={[styles.kbjvLabel, { color: colors.secondaryLabel }]}
-              >
-                Ж
-              </Text>
             </View>
             <View
               style={[
@@ -129,17 +129,17 @@ export default function HistoryItemCard({
             />
             <View style={styles.kbjvItem}>
               <Text
+                style={[styles.kbjvLabel, { color: colors.secondaryLabel }]}
+              >
+                В
+              </Text>
+              <Text
                 style={[
                   styles.kbjvValue,
                   { color: colors.label, fontVariant: ["tabular-nums"] },
                 ]}
               >
                 {result.carbs}г
-              </Text>
-              <Text
-                style={[styles.kbjvLabel, { color: colors.secondaryLabel }]}
-              >
-                В
               </Text>
             </View>
           </View>
@@ -182,15 +182,16 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   kbjvItem: {
-    flexDirection: "column",
+    flexDirection: "row",
     alignItems: "center",
+    gap: 4,
   },
   kbjvValue: {
     fontSize: 12,
     fontWeight: "700",
   },
   kbjvLabel: {
-    fontSize: 9,
+    fontSize: 12,
     fontWeight: "500",
     textTransform: "uppercase",
   },

@@ -1,6 +1,7 @@
 import { StyleSheet, Text, View } from "react-native";
-import { colors } from "../constants/theme";
+import { colors, nativeStyles } from "../constants/theme";
 import { ScanResult } from "../types/history";
+import MacroProgress from "./MacroProgress";
 import Card from "./ui/Card";
 import NativeIcon from "./ui/NativeIcon";
 
@@ -9,51 +10,16 @@ interface ScanResultCardProps {
 }
 
 export default function ScanResultCard({ result }: ScanResultCardProps) {
-  const renderMacroProgress = (
-    value: number | null,
-    total: number,
-    label: string,
-    color: string,
-    suffix: string = "г",
-  ) => {
-    const displayValue = value === null ? "-" : `${value}${suffix}`;
-    const numericValue = value === null ? 0 : value;
-
-    const maxVal = total > 0 ? total : 100;
-    const progress = Math.min(numericValue / maxVal, 1);
-
-    return (
-      <View style={styles.macroProgressContainer}>
-        <View style={styles.macroHeaderRow}>
-          <Text style={[styles.macroLabel, { color: colors.label }]}>
-            {label}
-          </Text>
-          <Text
-            style={[
-              styles.macroValue,
-              { color, fontVariant: ["tabular-nums"] },
-            ]}
-          >
-            {displayValue}
-          </Text>
-        </View>
-        <View style={styles.macroTrack}>
-          <View
-            style={[
-              styles.macroBar,
-              { backgroundColor: color, width: `${progress * 100}%` },
-            ]}
-          />
-        </View>
-      </View>
-    );
-  };
-
   return (
     <View style={styles.container}>
       <Card style={styles.resultHeaderCardOverrides}>
-        <Text style={[styles.resultLabel, { color: colors.secondaryLabel }]}>
-          AI ПРОАНАЛІЗУВАВ ФОТО:
+        <Text
+          style={[
+            nativeStyles.sectionTitle,
+            { color: colors.secondaryLabel, marginBottom: 4 },
+          ]}
+        >
+          AI проаналізував фото:
         </Text>
         <Text
           style={[styles.resultFoodName, { color: colors.label }]}
@@ -65,25 +31,40 @@ export default function ScanResultCard({ result }: ScanResultCardProps) {
 
       <Card style={styles.resultsCardOverrides}>
         <Text style={[styles.resultsCardTitle, { color: colors.label }]}>
-          МАКРОНУТРІЄНТИ
+          Макронутрієнти
         </Text>
 
-        {renderMacroProgress(
-          result.calories,
-          1000,
-          "Калорійність",
-          "#FF5252",
-          " ккал",
-        )}
-        {renderMacroProgress(result.protein, 80, "Білки", "#4CAF50")}
-        {renderMacroProgress(result.fat, 70, "Жири", "#FFC107")}
-        {renderMacroProgress(result.carbs, 150, "Вуглеводи", "#00BCD4")}
+        <MacroProgress
+          value={result.calories}
+          total={1000}
+          label="Калорійність"
+          color="#FF5252"
+          suffix=" ккал"
+        />
+        <MacroProgress
+          value={result.protein}
+          total={80}
+          label="Білки"
+          color="#4CAF50"
+        />
+        <MacroProgress
+          value={result.fat}
+          total={70}
+          label="Жири"
+          color="#FFC107"
+        />
+        <MacroProgress
+          value={result.carbs}
+          total={150}
+          label="Вуглеводи"
+          color="#00BCD4"
+        />
       </Card>
 
       {result.ingredients && result.ingredients.length > 0 && (
         <Card style={styles.resultsCardOverrides}>
           <Text style={[styles.resultsCardTitle, { color: colors.label }]}>
-            ВИЯВЛЕНІ ІНГРЕДІЄНТИ
+            Виявлені інгредієнти
           </Text>
           {result.ingredients.map((ing, idx) => (
             <View
@@ -106,15 +87,18 @@ export default function ScanResultCard({ result }: ScanResultCardProps) {
 
       <Card style={styles.resultsCardOverrides}>
         <Text style={[styles.resultsCardTitle, { color: colors.label }]}>
-          ДЕТАЛЬНИЙ АНАЛІЗ
+          Детальний аналіз
         </Text>
 
         <Text
-          style={[styles.subSectionLabel, { color: colors.secondaryLabel }]}
+          style={[
+            nativeStyles.sectionTitle,
+            { color: colors.secondaryLabel, marginTop: 16 },
+          ]}
         >
-          Що чудово у цій страві:
+          Плюси страви:
         </Text>
-        <View style={[styles.insightRow, styles.goodInsightBorder]}>
+        <View style={[styles.insightRow]}>
           <NativeIcon
             sf="checkmark.circle.fill"
             ion="checkmark-circle-outline"
@@ -130,11 +114,14 @@ export default function ScanResultCard({ result }: ScanResultCardProps) {
         </View>
 
         <Text
-          style={[styles.subSectionLabel, { color: colors.secondaryLabel }]}
+          style={[
+            nativeStyles.sectionTitle,
+            { color: colors.secondaryLabel, marginTop: 16 },
+          ]}
         >
           Потенційні ризики для вас:
         </Text>
-        <View style={[styles.insightRow, styles.riskInsightBorder]}>
+        <View style={[styles.insightRow]}>
           <NativeIcon
             sf="exclamationmark.triangle.fill"
             ion="warning-outline"
@@ -150,9 +137,12 @@ export default function ScanResultCard({ result }: ScanResultCardProps) {
         </View>
 
         <Text
-          style={[styles.subSectionLabel, { color: colors.secondaryLabel }]}
+          style={[
+            nativeStyles.sectionTitle,
+            { color: colors.secondaryLabel, marginTop: 16 },
+          ]}
         >
-          Висновок дієтолога:
+          Висновок AI:
         </Text>
         <View style={styles.summaryBox}>
           <Text
@@ -176,12 +166,6 @@ const styles = StyleSheet.create({
     marginBottom: 16,
     alignItems: "center",
   },
-  resultLabel: {
-    fontSize: 13,
-    fontWeight: "500",
-    marginBottom: 4,
-    textTransform: "uppercase",
-  },
   resultFoodName: {
     fontSize: 22,
     fontWeight: "700",
@@ -195,32 +179,6 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: "700",
     marginBottom: 16,
-  },
-  macroProgressContainer: {
-    marginBottom: 16,
-  },
-  macroHeaderRow: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    marginBottom: 6,
-  },
-  macroLabel: {
-    fontSize: 15,
-    fontWeight: "500",
-  },
-  macroValue: {
-    fontSize: 15,
-    fontWeight: "700",
-  },
-  macroTrack: {
-    height: 8,
-    backgroundColor: "rgba(255,255,255,0.05)",
-    borderRadius: 4,
-    overflow: "hidden",
-  },
-  macroBar: {
-    height: "100%",
-    borderRadius: 4,
   },
   ingredientRow: {
     flexDirection: "row",
@@ -237,27 +195,14 @@ const styles = StyleSheet.create({
     fontWeight: "600",
     marginLeft: 10,
   },
-  subSectionLabel: {
-    fontSize: 13,
-    fontWeight: "600",
-    marginTop: 16,
-    marginBottom: 8,
-    textTransform: "uppercase",
-  },
   insightRow: {
     flexDirection: "row",
     backgroundColor: "rgba(255,255,255,0.03)",
     padding: 12,
     borderRadius: 10,
     borderCurve: "continuous",
-    borderLeftWidth: 3,
   },
-  goodInsightBorder: {
-    borderLeftColor: colors.accent,
-  },
-  riskInsightBorder: {
-    borderLeftColor: colors.systemOrange,
-  },
+
   insightText: {
     flex: 1,
     fontSize: 14,

@@ -79,4 +79,10 @@ export const nativeStyles = StyleSheet.create({
       },
     }),
   },
+  sectionTitle: {
+    fontSize: 13,
+    fontWeight: "500",
+    marginBottom: 8,
+    textTransform: "none",
+  },
 });
