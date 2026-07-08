@@ -1,5 +1,5 @@
-import { ScanResult } from "../context/HistoryContext";
-import { ProfileData } from "../context/ProfileContext";
+import { ScanResult } from "../types/history";
+import { ProfileData } from "../types/profile";
 
 const getBackendUrl = () => {
   return (

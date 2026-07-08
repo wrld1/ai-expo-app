@@ -21,7 +21,8 @@ import Animated, {
 } from "react-native-reanimated";
 import { analyzeFoodImageBackend } from "../api/analyze";
 import { colors } from "../constants/theme";
-import { ScanResult, useHistory } from "../context/HistoryContext";
+import { useHistory } from "../context/HistoryContext";
+import { ScanResult } from "../types/history";
 import { useProfile } from "../context/ProfileContext";
 import {
   triggerHapticError,

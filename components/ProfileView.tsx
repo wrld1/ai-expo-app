@@ -244,19 +244,16 @@ export default function ProfileView() {
     }
   };
 
-  const isEnvKeyLoaded = !!process.env.EXPO_PUBLIC_GEMINI_API_KEY;
-
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === "ios" ? "padding" : "height"}
       style={[styles.container, { backgroundColor: colors.systemBackground }]}
-      keyboardVerticalOffset={Platform.OS === "ios" ? 88 : 0}
     >
       <ScrollView
         contentInsetAdjustmentBehavior="automatic"
         contentContainerStyle={styles.scrollContent}
       >
-        <FormSection title="ПЕРСОНАЛЬНІ ДАНІ">
+        <FormSection title="Персональні дані">
           {Platform.OS === "ios" ? (
             <SettingsRow
               label="Вік"
@@ -348,7 +345,7 @@ export default function ProfileView() {
           </SettingsRow>
         </FormSection>
 
-        <FormSection title="АЛЕРГІЇ ТА ОБМЕЖЕННЯ">
+        <FormSection title="Алергії та обмеження">
           <View style={styles.chipsContainerRow}>
             <Text style={[styles.rowSubText, { color: colors.secondaryLabel }]}>
               Оберіть алергени для попередження про ризики страви:
@@ -425,7 +422,7 @@ export default function ProfileView() {
           )}
         </FormSection>
 
-        <FormSection title="ЦІЛІ ТА СИМПТОМИ">
+        <FormSection title="Цілі та симптоми">
           <View style={styles.chipsContainerRow}>
             <Text style={[styles.rowSubText, { color: colors.secondaryLabel }]}>
               На чому сфокусувати увагу AI при аналізі?
@@ -437,12 +434,6 @@ export default function ProfileView() {
             />
           </View>
         </FormSection>
-
-        <Text style={[styles.cardFooterText, { color: colors.secondaryLabel }]}>
-          {isEnvKeyLoaded
-            ? "✓ Ключ завантажено з конфігурації (.env)"
-            : "Ключ відсутній у .env. Для роботи потрібен ручний API ключ."}
-        </Text>
 
         <TouchableOpacity
           style={[styles.saveBtn, { backgroundColor: colors.accent }]}

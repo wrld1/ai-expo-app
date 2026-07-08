@@ -1,7 +1,7 @@
 import React from "react";
 import { StyleSheet, Text, View } from "react-native";
 import { colors } from "../constants/theme";
-import { ScanResult } from "../context/HistoryContext";
+import { ScanResult } from "../types/history";
 import NativeIcon from "./NativeIcon";
 
 interface ScanResultCardProps {

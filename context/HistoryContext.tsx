@@ -1,34 +1,9 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-
-export interface Ingredient {
-  name: string;
-  weight: string;
-}
-
-export interface ScanResult {
-  foodName: string;
-  calories: number | null;
-  protein: number | null;
-  fat: number | null;
-  carbs: number | null;
-  ingredients: Ingredient[];
-  whatIsGood: string;
-  risks: string;
-  summary: string;
-}
-
-export interface HistoryItem {
-  id: string;
-  date: string;
-  imageUri: string;
-  result: ScanResult;
-  correctionHistory?: Array<{ userPrompt: string; result: ScanResult }>;
-}
+import { HistoryItem, ScanResult } from "../types/history";
 
 interface HistoryContextType {
   history: HistoryItem[];
-  isLoading: boolean;
   addHistoryItem: (imageUri: string, result: ScanResult) => Promise<HistoryItem>;
   updateHistoryItemResult: (id: string, newResult: ScanResult, correctionText: string) => Promise<void>;
   deleteHistoryItem: (id: string) => Promise<void>;
@@ -41,7 +16,6 @@ const HISTORY_STORAGE_KEY = "@food_scanner_history";
 
 export const HistoryProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [history, setHistory] = useState<HistoryItem[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     loadHistory();
@@ -55,8 +29,6 @@ export const HistoryProvider: React.FC<{ children: React.ReactNode }> = ({ child
       }
     } catch (e) {
       console.error("Failed to load history", e);
-    } finally {
-      setIsLoading(false);
     }
   };
 
@@ -121,7 +93,6 @@ export const HistoryProvider: React.FC<{ children: React.ReactNode }> = ({ child
     <HistoryContext.Provider
       value={{
         history,
-        isLoading,
         addHistoryItem,
         updateHistoryItemResult,
         deleteHistoryItem,
