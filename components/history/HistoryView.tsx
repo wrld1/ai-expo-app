@@ -9,16 +9,16 @@ import {
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { colors } from "../constants/theme";
-import { useHistory } from "../context/HistoryContext";
-import { HistoryItem } from "../types/history";
+import { colors } from "../../constants/theme";
+import { useHistory } from "../../context/HistoryContext";
+import { HistoryItem } from "../../types/history";
 import {
   triggerHapticLight,
   triggerHapticMedium,
   triggerHapticSuccess,
-} from "../utils/haptics";
+} from "../../utils/haptics";
 import HistoryItemModal from "./HistoryItemModal";
-import NativeIcon from "./ui/NativeIcon";
+import NativeIcon from "../ui/NativeIcon";
 
 import HistoryItemCard from "./HistoryItemCard";
 

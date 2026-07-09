@@ -1,6 +1,6 @@
 import React from "react";
 import { StyleSheet, Text, View } from "react-native";
-import { colors } from "../constants/theme";
+import { colors } from "../../constants/theme";
 
 interface MacroProgressProps {
   value: number | null;

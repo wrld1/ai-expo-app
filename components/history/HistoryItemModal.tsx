@@ -8,13 +8,13 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import { colors } from "../constants/theme";
-import { HistoryItem } from "../types/history";
-import { formatUkDate } from "../utils/date";
-import { triggerHapticLight } from "../utils/haptics";
-import ScanResultCard from "./ScanResultCard";
-import Card from "./ui/Card";
-import NativeIcon from "./ui/NativeIcon";
+import { colors } from "../../constants/theme";
+import { HistoryItem } from "../../types/history";
+import { formatUkDate } from "../../utils/date";
+import { triggerHapticLight } from "../../utils/haptics";
+import ScanResultCard from "../scan/ScanResultCard";
+import Card from "../ui/Card";
+import NativeIcon from "../ui/NativeIcon";
 
 interface HistoryItemModalProps {
   visible: boolean;

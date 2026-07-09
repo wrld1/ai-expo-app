@@ -1,9 +1,9 @@
 import { StyleSheet, Text, View } from "react-native";
-import { colors, nativeStyles } from "../constants/theme";
-import { ScanResult } from "../types/history";
+import { colors, nativeStyles } from "../../constants/theme";
+import { ScanResult } from "../../types/history";
 import MacroProgress from "./MacroProgress";
-import Card from "./ui/Card";
-import NativeIcon from "./ui/NativeIcon";
+import Card from "../ui/Card";
+import NativeIcon from "../ui/NativeIcon";
 
 interface ScanResultCardProps {
   result: ScanResult;
@@ -13,12 +13,7 @@ export default function ScanResultCard({ result }: ScanResultCardProps) {
   return (
     <View style={styles.container}>
       <Card style={styles.resultHeaderCardOverrides}>
-        <Text
-          style={[
-            nativeStyles.sectionTitle,
-            { color: colors.secondaryLabel, marginBottom: 4 },
-          ]}
-        >
+        <Text style={[nativeStyles.sectionTitle, { marginBottom: 4 }]}>
           AI проаналізував фото:
         </Text>
         <Text
@@ -90,21 +85,23 @@ export default function ScanResultCard({ result }: ScanResultCardProps) {
           Детальний аналіз
         </Text>
 
-        <Text
-          style={[
-            nativeStyles.sectionTitle,
-            { color: colors.secondaryLabel, marginTop: 16 },
-          ]}
-        >
-          Плюси страви:
-        </Text>
-        <View style={[styles.insightRow]}>
+        <View style={styles.sectionHeaderRow}>
           <NativeIcon
             sf="checkmark.circle.fill"
             ion="checkmark-circle-outline"
             size={18}
             color={colors.accent}
           />
+          <Text
+            style={[
+              nativeStyles.sectionTitle,
+              { marginTop: 0, marginBottom: 0, marginLeft: 8 },
+            ]}
+          >
+            Плюси страви:
+          </Text>
+        </View>
+        <View style={[nativeStyles.innerBox]}>
           <Text
             style={[styles.insightText, { color: colors.label }]}
             selectable
@@ -113,21 +110,23 @@ export default function ScanResultCard({ result }: ScanResultCardProps) {
           </Text>
         </View>
 
-        <Text
-          style={[
-            nativeStyles.sectionTitle,
-            { color: colors.secondaryLabel, marginTop: 16 },
-          ]}
-        >
-          Потенційні ризики для вас:
-        </Text>
-        <View style={[styles.insightRow]}>
+        <View style={styles.sectionHeaderRow}>
           <NativeIcon
             sf="exclamationmark.triangle.fill"
             ion="warning-outline"
             size={18}
             color={colors.systemOrange}
           />
+          <Text
+            style={[
+              nativeStyles.sectionTitle,
+              { marginTop: 0, marginBottom: 0, marginLeft: 8 },
+            ]}
+          >
+            Потенційні ризики для вас:
+          </Text>
+        </View>
+        <View style={[nativeStyles.innerBox]}>
           <Text
             style={[styles.insightText, { color: colors.label }]}
             selectable
@@ -136,15 +135,10 @@ export default function ScanResultCard({ result }: ScanResultCardProps) {
           </Text>
         </View>
 
-        <Text
-          style={[
-            nativeStyles.sectionTitle,
-            { color: colors.secondaryLabel, marginTop: 16 },
-          ]}
-        >
+        <Text style={[nativeStyles.sectionTitle, { marginTop: 16 }]}>
           Висновок AI:
         </Text>
-        <View style={styles.summaryBox}>
+        <View style={[nativeStyles.innerBox]}>
           <Text
             style={[styles.summaryText, { color: colors.label }]}
             selectable
@@ -175,10 +169,16 @@ const styles = StyleSheet.create({
     padding: 16,
     marginBottom: 16,
   },
+  sectionHeaderRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 8,
+    marginTop: 8,
+    marginLeft: 16,
+  },
   resultsCardTitle: {
     fontSize: 18,
     fontWeight: "700",
-    marginBottom: 16,
   },
   ingredientRow: {
     flexDirection: "row",
@@ -195,26 +195,10 @@ const styles = StyleSheet.create({
     fontWeight: "600",
     marginLeft: 10,
   },
-  insightRow: {
-    flexDirection: "row",
-    backgroundColor: "rgba(255,255,255,0.03)",
-    padding: 12,
-    borderRadius: 10,
-    borderCurve: "continuous",
-  },
-
   insightText: {
     flex: 1,
     fontSize: 14,
     lineHeight: 20,
-    marginLeft: 10,
-  },
-  summaryBox: {
-    backgroundColor: "rgba(255,255,255,0.03)",
-    padding: 14,
-    borderRadius: 10,
-    borderCurve: "continuous",
-    marginTop: 4,
   },
   summaryText: {
     fontSize: 15,

@@ -2,11 +2,11 @@ import { Image } from "expo-image";
 import React from "react";
 import { Alert, StyleSheet, Text, View } from "react-native";
 import Animated, { FadeIn, FadeOut } from "react-native-reanimated";
-import { colors } from "../constants/theme";
-import { HistoryItem } from "../types/history";
-import { formatUkDate } from "../utils/date";
-import { triggerHapticLight } from "../utils/haptics";
-import Card from "./ui/Card";
+import { colors } from "../../constants/theme";
+import { HistoryItem } from "../../types/history";
+import { formatUkDate } from "../../utils/date";
+import { triggerHapticLight } from "../../utils/haptics";
+import Card from "../ui/Card";
 
 interface HistoryItemCardProps {
   item: HistoryItem;

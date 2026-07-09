@@ -16,13 +16,13 @@ import {
 } from "react-native";
 import * as z from "zod";
 
-import { colors, nativeStyles } from "../constants/theme";
-import { useProfile } from "../context/ProfileContext";
+import { colors, nativeStyles } from "../../constants/theme";
+import { useProfile } from "../../context/ProfileContext";
 import {
   triggerHapticError,
   triggerHapticLight,
   triggerHapticSuccess,
-} from "../utils/haptics";
+} from "../../utils/haptics";
 
 const profileSchema = z.object({
   age: z.string().min(1, "Вік обов'язковий"),
@@ -52,8 +52,6 @@ const CONCERN_PRESETS = [
   "Загальний тонус",
 ];
 
-// --- Sub-components for cleaner JSX ---
-
 function FormSection({
   title,
   children,
@@ -63,9 +61,7 @@ function FormSection({
 }) {
   return (
     <View style={styles.sectionContainer}>
-      <Text style={[nativeStyles.sectionTitle, { color: colors.secondaryLabel, marginLeft: 16 }]}>
-        {title}
-      </Text>
+      <Text style={[nativeStyles.sectionTitle]}>{title}</Text>
       <View
         style={[
           styles.groupedCard,
@@ -247,7 +243,10 @@ export default function ProfileView() {
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === "ios" ? "padding" : "height"}
-      style={[styles.container, { backgroundColor: colors.systemGroupedBackground }]}
+      style={[
+        styles.container,
+        { backgroundColor: colors.systemGroupedBackground },
+      ]}
     >
       <ScrollView
         contentInsetAdjustmentBehavior="automatic"

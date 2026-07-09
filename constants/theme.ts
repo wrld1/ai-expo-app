@@ -81,8 +81,20 @@ export const nativeStyles = StyleSheet.create({
   },
   sectionTitle: {
     fontSize: 13,
-    fontWeight: "500",
+    fontWeight: "600",
     marginBottom: 8,
     textTransform: "none",
+    marginLeft: 16,
+    color: colors.secondaryLabel,
+  },
+  innerBox: {
+    backgroundColor: colors.systemGroupedBackground,
+    padding: 14,
+    borderRadius: 10,
+    ...Platform.select({
+      ios: {
+        borderCurve: "continuous",
+      },
+    }),
   },
 });
