@@ -1,9 +1,21 @@
+export type AnalysisConfidence = "low" | "medium" | "high";
+export type AnalysisWarning =
+  | "poor_image_quality"
+  | "multiple_dishes"
+  | "hidden_ingredients"
+  | "weight_estimation_uncertain";
+
 export interface Ingredient {
   name: string;
   weight: string;
+  confidence?: AnalysisConfidence;
 }
 
 export interface ScanResult {
+  confidence: AnalysisConfidence;
+  warnings: AnalysisWarning[];
+  allergyAlerts: string[];
+  medicalAdviceRequested: boolean;
   foodName: string;
   calories: number | null;
   protein: number | null;

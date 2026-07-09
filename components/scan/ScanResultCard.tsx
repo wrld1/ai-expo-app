@@ -1,6 +1,6 @@
 import { StyleSheet, Text, View } from "react-native";
 import { colors, nativeStyles } from "../../constants/theme";
-import { ScanResult } from "../../types/history";
+import { ScanResult, AnalysisWarning } from "../../types/history";
 import MacroProgress from "./MacroProgress";
 import Card from "../ui/Card";
 import NativeIcon from "../ui/NativeIcon";
@@ -8,6 +8,21 @@ import NativeIcon from "../ui/NativeIcon";
 interface ScanResultCardProps {
   result: ScanResult;
 }
+
+const getWarningText = (warning: AnalysisWarning) => {
+  switch (warning) {
+    case "poor_image_quality":
+      return "Погана якість фото. Результати можуть бути неточними.";
+    case "multiple_dishes":
+      return "Виявлено кілька страв. Аналіз може бути узагальненим.";
+    case "hidden_ingredients":
+      return "Можливі приховані інгредієнти (наприклад, у соусі чи начинці).";
+    case "weight_estimation_uncertain":
+      return "Складно визначити точну вагу порції.";
+    default:
+      return "Увага: результати можуть бути неточними.";
+  }
+};
 
 export default function ScanResultCard({ result }: ScanResultCardProps) {
   return (
@@ -23,6 +38,52 @@ export default function ScanResultCard({ result }: ScanResultCardProps) {
           {result.foodName}
         </Text>
       </Card>
+
+      {result.allergyAlerts && result.allergyAlerts.length > 0 && (
+        <Card style={[styles.resultsCardOverrides, { backgroundColor: 'rgba(255, 59, 48, 0.1)', borderColor: colors.systemRed, borderWidth: 1 }]}>
+          <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 8 }}>
+            <NativeIcon sf="exclamationmark.octagon.fill" ion="alert-circle" size={20} color={colors.systemRed} />
+            <Text style={[styles.resultsCardTitle, { color: colors.systemRed, marginLeft: 8 }]}>Увага! Алергени</Text>
+          </View>
+          <Text style={{ color: colors.label, fontSize: 14 }}>
+            Можлива наявність алергенів: <Text style={{ fontWeight: 'bold' }}>{result.allergyAlerts.join(", ")}</Text>
+          </Text>
+        </Card>
+      )}
+
+      {result.medicalAdviceRequested && (
+        <Card style={[styles.resultsCardOverrides, { backgroundColor: 'rgba(255, 149, 0, 0.1)', borderColor: colors.systemOrange, borderWidth: 1 }]}>
+          <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 8 }}>
+            <NativeIcon sf="waveform.path.ecg" ion="medical" size={20} color={colors.systemOrange} />
+            <Text style={[styles.resultsCardTitle, { color: colors.systemOrange, marginLeft: 8 }]}>Медичне застереження</Text>
+          </View>
+          <Text style={{ color: colors.label, fontSize: 14 }}>
+            Штучний інтелект не може надавати медичні діагнози або поради.
+          </Text>
+        </Card>
+      )}
+
+      {result.warnings && result.warnings.length > 0 && (
+        <Card style={[styles.resultsCardOverrides, { backgroundColor: 'rgba(255, 204, 0, 0.1)', borderColor: colors.systemYellow, borderWidth: 1 }]}>
+           <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 8 }}>
+            <NativeIcon sf="exclamationmark.triangle.fill" ion="warning" size={20} color={colors.systemYellow} />
+            <Text style={[styles.resultsCardTitle, { color: colors.systemYellow, marginLeft: 8 }]}>Зауваження щодо аналізу</Text>
+          </View>
+          {result.warnings.map((w, idx) => (
+             <Text key={idx} style={{ color: colors.label, fontSize: 14, marginBottom: 4 }}>
+               • {getWarningText(w)}
+             </Text>
+          ))}
+        </Card>
+      )}
+      
+      {result.confidence === 'low' && (!result.warnings || result.warnings.length === 0) && (
+        <Card style={[styles.resultsCardOverrides, { backgroundColor: 'rgba(255, 204, 0, 0.1)', borderColor: colors.systemYellow, borderWidth: 1 }]}>
+           <Text style={{ color: colors.systemYellow, fontSize: 14, fontWeight: '500' }}>
+             Низька впевненість розпізнавання. Будь ласка, перевірте результати.
+           </Text>
+        </Card>
+      )}
 
       <Card style={styles.resultsCardOverrides}>
         <Text style={[styles.resultsCardTitle, { color: colors.label }]}>

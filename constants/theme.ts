@@ -57,6 +57,11 @@ export const colors: ThemeColors = {
     android: safePlatformColor("?attr/colorTertiary", "#FF9500"),
     default: "#FF9500",
   })!,
+  systemYellow: Platform.select<ColorValue>({
+    ios: safePlatformColor("systemYellow", "#FFCC00"),
+    android: safePlatformColor("?attr/colorTertiaryContainer", "#FFCC00"),
+    default: "#FFCC00",
+  })!,
   placeholder: "#6B7280",
 };
 

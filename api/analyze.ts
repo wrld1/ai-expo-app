@@ -1,11 +1,21 @@
-import { ScanResult } from "../types/history";
+import * as ImageManipulator from "expo-image-manipulator";
+import { Platform } from "react-native";
+import { z } from "zod";
+import {
+  AnalysisConfidence,
+  AnalysisWarning,
+  ScanResult,
+} from "../types/history";
 import { ProfileData } from "../types/profile";
 
+const API_URL =
+  process.env.EXPO_PUBLIC_API_URL ||
+  (Platform.OS === "android"
+    ? "http://10.0.2.2:3000/api/analyze"
+    : "http://localhost:3000/api/analyze");
+
 const getBackendUrl = () => {
-  return (
-    (process.env.EXPO_PUBLIC_API_URL || "http://localhost:3000") +
-    "/api/analyze"
-  );
+  return API_URL;
 };
 
 export async function analyzeFoodImageBackend(
@@ -16,8 +26,20 @@ export async function analyzeFoodImageBackend(
   const url = getBackendUrl();
   const formData = new FormData();
 
+  let finalUri = imageUri;
+  try {
+    const manipResult = await ImageManipulator.manipulateAsync(
+      imageUri,
+      [{ resize: { width: 800 } }],
+      { compress: 0.7, format: ImageManipulator.SaveFormat.JPEG },
+    );
+    finalUri = manipResult.uri;
+  } catch (err) {
+    console.warn("Failed to compress image, using original:", err);
+  }
+
   formData.append("image", {
-    uri: imageUri,
+    uri: finalUri,
     name: "photo.jpg",
     type: "image/jpeg",
   } as unknown as Blob);
@@ -28,48 +50,74 @@ export async function analyzeFoodImageBackend(
     formData.append("correctionPrompt", correctionText);
   }
 
-  const response = await fetch(url, {
-    method: "POST",
-    body: formData,
-    headers: {
-      Accept: "application/json",
-    },
-  });
+  try {
+    const response = await fetch(url, {
+      method: "POST",
+      body: formData,
+      headers: {
+        Accept: "application/json",
+      },
+    });
 
-  if (!response.ok) {
-    let errorMsg = "Помилка сервера";
-    try {
-      const errorJson = await response.json();
-      errorMsg = errorJson.error || errorMsg;
-    } catch {}
-    throw new Error(errorMsg);
-  }
+    if (!response.ok) {
+      let errorMsg = "Помилка сервера";
+      try {
+        const errorJson = await response.json();
+        errorMsg = errorJson.error || errorMsg;
+      } catch {}
+      throw new Error(errorMsg);
+    }
 
-  const rawResult = await response.json();
+    const data: any = await response.json();
 
-  const safeNumber = (val: unknown): number | null => {
-    if (typeof val === "number") return val;
-    return null;
-  };
+    const userAllergies = (profile.allergies || []).map((a) => a.toLowerCase());
+    const allergyAlerts: string[] = [];
 
-  return {
-    foodName: rawResult.detected_food?.[0]?.name || "Невідома страва",
-    calories: safeNumber(rawResult.total?.calories),
-    protein: safeNumber(rawResult.total?.protein),
-    fat: safeNumber(rawResult.total?.fat),
-    carbs: safeNumber(rawResult.total?.carbs),
-    ingredients: (rawResult.detected_food || []).map(
-      (food: { name: string; estimated_weight?: string }) => ({
+    if (userAllergies.length > 0) {
+      for (const food of data.detected_food) {
+        const foodNameLower = (food as any).name.toLowerCase();
+        for (const allergy of userAllergies) {
+          if (foodNameLower.includes(allergy)) {
+            if (!allergyAlerts.includes(allergy)) {
+              allergyAlerts.push(allergy);
+            }
+          }
+        }
+      }
+    }
+
+    const safeNumber = (val: unknown): number | null => {
+      if (typeof val === "number") return val;
+      return null;
+    };
+
+    return {
+      confidence: data.confidence as AnalysisConfidence,
+      warnings: data.warnings as AnalysisWarning[],
+      medicalAdviceRequested: data.medical_advice_requested,
+      allergyAlerts,
+      foodName: data.detected_food[0]?.name || "Невідома страва",
+      calories: safeNumber(data.total.calories),
+      protein: safeNumber(data.total.protein),
+      fat: safeNumber(data.total.fat),
+      carbs: safeNumber(data.total.carbs),
+      ingredients: data.detected_food.map((food: any) => ({
         name: food.name,
         weight: food.estimated_weight || "Невідомо",
-      }),
-    ),
-    whatIsGood:
-      rawResult.good_points?.map((p: string) => `• ${p}`).join("\n") ||
-      "Немає даних",
-    risks:
-      rawResult.bad_points?.map((p: string) => `• ${p}`).join("\n") ||
-      "Немає даних",
-    summary: rawResult.personalized_summary || "",
-  };
+        confidence: food.estimated_weight_confidence as
+          | AnalysisConfidence
+          | undefined,
+      })),
+      whatIsGood:
+        Array.isArray(data.good_points)
+          ? data.good_points.map((p: any) => `• ${p}`).join("\n")
+          : "Немає даних",
+      risks: Array.isArray(data.bad_points)
+        ? data.bad_points.map((p: any) => `• ${p}`).join("\n") || "Немає даних"
+        : "Немає даних",
+      summary: data.personalized_summary || "",
+    };
+  } catch (error: any) {
+    throw error;
+  }
 }

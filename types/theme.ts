@@ -10,5 +10,6 @@ export interface ThemeColors {
   accent: ColorValue;
   systemRed: ColorValue;
   systemOrange: ColorValue;
+  systemYellow: ColorValue;
   placeholder: string;
 }
