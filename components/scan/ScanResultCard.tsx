@@ -17,7 +17,7 @@ export default function ScanResultCard({ result }: ScanResultCardProps) {
     <View style={styles.container}>
       <Card style={styles.resultHeaderCardOverrides}>
         <Text style={[nativeStyles.sectionTitle, { marginBottom: 4 }]}>
-          AI проаналізував фото:
+          Результат аналізу:
         </Text>
         <Text
           style={[styles.resultFoodName, { color: colors.label }]}
@@ -79,7 +79,12 @@ export default function ScanResultCard({ result }: ScanResultCardProps) {
         )}
 
       <Card style={styles.resultsCardOverrides}>
-        <Text style={[styles.resultsCardTitle, { color: colors.label }]}>
+        <Text
+          style={[
+            styles.resultsCardTitle,
+            { color: colors.label, marginBottom: 12 },
+          ]}
+        >
           Макронутрієнти
         </Text>
 
@@ -112,7 +117,12 @@ export default function ScanResultCard({ result }: ScanResultCardProps) {
 
       {result.ingredients && result.ingredients.length > 0 && (
         <Card style={styles.resultsCardOverrides}>
-          <Text style={[styles.resultsCardTitle, { color: colors.label }]}>
+          <Text
+            style={[
+              styles.resultsCardTitle,
+              { color: colors.label, marginBottom: 4 },
+            ]}
+          >
             Виявлені інгредієнти
           </Text>
           {result.ingredients.map((ing, idx) => (
@@ -138,95 +148,77 @@ export default function ScanResultCard({ result }: ScanResultCardProps) {
           Детальний аналіз
         </Text>
 
-        <View style={styles.sectionHeaderRow}>
-          <NativeIcon
-            sf="checkmark.circle.fill"
-            ion="checkmark-circle-outline"
-            size={18}
-            color={colors.accent}
-          />
-          <Text
-            style={[
-              nativeStyles.sectionTitle,
-              { marginTop: 0, marginBottom: 0, marginLeft: 8 },
-            ]}
-          >
-            Плюси страви:
-          </Text>
-        </View>
-        <View style={[nativeStyles.innerBox]}>
-          {Array.isArray(result.whatIsGood) && result.whatIsGood.length > 0 ? (
-            result.whatIsGood.map((item, idx) => (
+        {result.whatIsGood && result.whatIsGood.length > 0 && (
+          <View>
+            <View style={styles.sectionHeaderRow}>
+              <NativeIcon
+                sf="checkmark.circle.fill"
+                ion="checkmark-circle-outline"
+                size={18}
+                color={colors.accent}
+              />
               <Text
-                key={idx}
-                style={[styles.insightText, { color: colors.label, marginBottom: 4 }]}
-                selectable
+                style={[
+                  nativeStyles.sectionTitle,
+                  { marginTop: 0, marginBottom: 0, marginLeft: 8 },
+                ]}
               >
-                • {item}
+                Плюси страви:
               </Text>
-            ))
-          ) : typeof result.whatIsGood === "string" && result.whatIsGood ? (
-            <Text
-              style={[styles.insightText, { color: colors.label }]}
-              selectable
-            >
-              {result.whatIsGood}
-            </Text>
-          ) : (
-            <Text
-              style={[styles.insightText, { color: colors.secondaryLabel }]}
-              selectable
-            >
-              Немає даних
-            </Text>
-          )}
-        </View>
+            </View>
+            <View style={[nativeStyles.innerBox]}>
+              {result.whatIsGood.map((item, idx) => (
+                <Text
+                  key={idx}
+                  style={[
+                    styles.insightText,
+                    { color: colors.label, marginBottom: 4 },
+                  ]}
+                  selectable
+                >
+                  • {item}
+                </Text>
+              ))}
+            </View>
+          </View>
+        )}
+
+        {result.risks && result.risks.length > 0 && (
+          <View>
+            <View style={styles.sectionHeaderRow}>
+              <NativeIcon
+                sf="exclamationmark.triangle.fill"
+                ion="warning-outline"
+                size={18}
+                color={colors.systemOrange}
+              />
+              <Text
+                style={[
+                  nativeStyles.sectionTitle,
+                  { marginTop: 0, marginBottom: 0, marginLeft: 8 },
+                ]}
+              >
+                Потенційні ризики для вас:
+              </Text>
+            </View>
+            <View style={[nativeStyles.innerBox]}>
+              {result.risks.map((item, idx) => (
+                <Text
+                  key={idx}
+                  style={[
+                    styles.insightText,
+                    { color: colors.label, marginBottom: 4 },
+                  ]}
+                  selectable
+                >
+                  • {item}
+                </Text>
+              ))}
+            </View>
+          </View>
+        )}
 
         <View style={styles.sectionHeaderRow}>
-          <NativeIcon
-            sf="exclamationmark.triangle.fill"
-            ion="warning-outline"
-            size={18}
-            color={colors.systemOrange}
-          />
-          <Text
-            style={[
-              nativeStyles.sectionTitle,
-              { marginTop: 0, marginBottom: 0, marginLeft: 8 },
-            ]}
-          >
-            Потенційні ризики для вас:
-          </Text>
-        </View>
-        <View style={[nativeStyles.innerBox]}>
-          {Array.isArray(result.risks) && result.risks.length > 0 ? (
-            result.risks.map((item, idx) => (
-              <Text
-                key={idx}
-                style={[styles.insightText, { color: colors.label, marginBottom: 4 }]}
-                selectable
-              >
-                • {item}
-              </Text>
-            ))
-          ) : typeof result.risks === "string" && result.risks ? (
-            <Text
-              style={[styles.insightText, { color: colors.label }]}
-              selectable
-            >
-              {result.risks}
-            </Text>
-          ) : (
-            <Text
-              style={[styles.insightText, { color: colors.secondaryLabel }]}
-              selectable
-            >
-              Немає даних
-            </Text>
-          )}
-        </View>
-
-        <View style={[styles.sectionHeaderRow, { marginTop: 16 }]}>
           <NativeIcon
             sf="brain.head.profile"
             ion="bulb-outline"
@@ -276,18 +268,17 @@ const styles = StyleSheet.create({
   sectionHeaderRow: {
     flexDirection: "row",
     alignItems: "center",
-    marginBottom: 10,
-    marginTop: 4,
+    marginBottom: 8,
+    marginTop: 16,
   },
   resultsCardTitle: {
     fontSize: 18,
     fontWeight: "700",
-    marginBottom: 16,
   },
   ingredientRow: {
     flexDirection: "row",
     justifyContent: "space-between",
-    paddingVertical: 12,
+    paddingVertical: 8,
   },
   ingredientName: {
     fontSize: 15,

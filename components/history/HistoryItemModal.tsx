@@ -13,8 +13,9 @@ import { HistoryItem } from "../../types/history";
 import { formatUkDate } from "../../utils/date";
 import { triggerHapticLight } from "../../utils/haptics";
 import ScanResultCard from "../scan/ScanResultCard";
-import Card from "../ui/Card";
+import Button from "../ui/Button";
 import NativeIcon from "../ui/NativeIcon";
+import CorrectionHistoryList from "./CorrectionHistoryList";
 
 interface HistoryItemModalProps {
   visible: boolean;
@@ -89,57 +90,22 @@ export default function HistoryItemModal({
 
             <ScanResultCard result={item.result} />
 
-            {item.correctionHistory && item.correctionHistory.length > 0 && (
-              <View style={{ marginTop: 10 }}>
-                <Text style={[styles.subSectionTitle, { color: colors.label }]}>
-                  Історія уточнень
-                </Text>
-                {item.correctionHistory.map((corr, idx) => (
-                  <Card key={idx} style={styles.correctionHistoryRowOverrides}>
-                    <View style={styles.corrUserBubble}>
-                      <Text
-                        style={[styles.corrUserText, { color: colors.label }]}
-                      >
-                        {'Коригування: "'}
-                        {corr.userPrompt}
-                        {'"'}
-                      </Text>
-                    </View>
-                    <View
-                      style={[
-                        styles.corrAiBubble,
-                        { backgroundColor: "rgba(44, 226, 162, 0.08)" },
-                      ]}
-                    >
-                      <Text
-                        style={[styles.corrAiText, { color: colors.accent }]}
-                      >
-                        AI оновив страву на: {corr.result.foodName} (
-                        {corr.result.calories} ккал)
-                      </Text>
-                    </View>
-                  </Card>
-                ))}
-              </View>
-            )}
+            <CorrectionHistoryList history={item.correctionHistory} />
 
             <View style={styles.modalFooterActions}>
-              <TouchableOpacity
-                style={[
-                  styles.modalDeleteBtn,
-                  { backgroundColor: colors.systemRed },
-                ]}
+              <Button
+                title="Видалити запис"
+                variant="destructive"
+                icon={
+                  <NativeIcon
+                    sf="trash"
+                    size={18}
+                    color="#FFFFFF"
+                    ion="trash-outline"
+                  />
+                }
                 onPress={() => onDelete(item.id)}
-              >
-                <NativeIcon
-                  sf="trash"
-                  size={18}
-                  color="#FFFFFF"
-                  ion="trash-outline"
-                  style={{ marginRight: 6 }}
-                />
-                <Text style={styles.modalDeleteBtnText}>Видалити запис</Text>
-              </TouchableOpacity>
+              />
             </View>
           </ScrollView>
         </View>
@@ -192,52 +158,11 @@ const styles = StyleSheet.create({
   },
   modalDate: {
     fontSize: 12,
-    marginBottom: 16,
+    marginBottom: 12,
     textAlign: "center",
-  },
-  subSectionTitle: {
-    fontSize: 15,
-    fontWeight: "700",
-    marginTop: 16,
-    marginBottom: 8,
-  },
-  correctionHistoryRowOverrides: {
-    padding: 12,
-    marginBottom: 8,
-  },
-  corrUserBubble: {
-    backgroundColor: "rgba(255, 255, 255, 0.04)",
-    padding: 8,
-    borderRadius: 8,
-    marginBottom: 6,
-  },
-  corrUserText: {
-    fontSize: 12,
-    fontStyle: "italic",
-  },
-  corrAiBubble: {
-    padding: 8,
-    borderRadius: 8,
-    borderLeftWidth: 2,
-    borderLeftColor: "#2CE2A2",
-  },
-  corrAiText: {
-    fontSize: 12,
   },
   modalFooterActions: {
     alignItems: "center",
-  },
-  modalDeleteBtn: {
-    flexDirection: "row",
-    alignItems: "center",
-    borderRadius: 10,
-    borderCurve: "continuous",
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-  },
-  modalDeleteBtnText: {
-    color: "#FFFFFF",
-    fontSize: 14,
-    fontWeight: "600",
+    marginTop: 8,
   },
 });

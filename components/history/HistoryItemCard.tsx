@@ -21,6 +21,13 @@ export default function HistoryItemCard({
 }: HistoryItemCardProps) {
   const { result } = item;
 
+  const macros = [
+    { label: "ккал", value: result.calories },
+    { label: "Б", value: result.protein, suffix: "г" },
+    { label: "Ж", value: result.fat, suffix: "г" },
+    { label: "В", value: result.carbs, suffix: "г" },
+  ];
+
   return (
     <Animated.View entering={FadeIn} exiting={FadeOut}>
       <Card
@@ -64,84 +71,34 @@ export default function HistoryItemCard({
           </Text>
 
           <View style={styles.kbjvGrid}>
-            <View style={styles.kbjvItem}>
-              <Text
-                style={[styles.kbjvLabel, { color: colors.secondaryLabel }]}
-              >
-                ккал
-              </Text>
-              <Text
-                style={[
-                  styles.kbjvValue,
-                  { color: colors.label, fontVariant: ["tabular-nums"] },
-                ]}
-              >
-                {result.calories}
-              </Text>
-            </View>
-            <View
-              style={[
-                styles.kbjvDivider,
-                { backgroundColor: colors.separator },
-              ]}
-            />
-            <View style={styles.kbjvItem}>
-              <Text
-                style={[styles.kbjvLabel, { color: colors.secondaryLabel }]}
-              >
-                Б
-              </Text>
-              <Text
-                style={[
-                  styles.kbjvValue,
-                  { color: colors.label, fontVariant: ["tabular-nums"] },
-                ]}
-              >
-                {result.protein}г
-              </Text>
-            </View>
-            <View
-              style={[
-                styles.kbjvDivider,
-                { backgroundColor: colors.separator },
-              ]}
-            />
-            <View style={styles.kbjvItem}>
-              <Text
-                style={[styles.kbjvLabel, { color: colors.secondaryLabel }]}
-              >
-                Ж
-              </Text>
-              <Text
-                style={[
-                  styles.kbjvValue,
-                  { color: colors.label, fontVariant: ["tabular-nums"] },
-                ]}
-              >
-                {result.fat}г
-              </Text>
-            </View>
-            <View
-              style={[
-                styles.kbjvDivider,
-                { backgroundColor: colors.separator },
-              ]}
-            />
-            <View style={styles.kbjvItem}>
-              <Text
-                style={[styles.kbjvLabel, { color: colors.secondaryLabel }]}
-              >
-                В
-              </Text>
-              <Text
-                style={[
-                  styles.kbjvValue,
-                  { color: colors.label, fontVariant: ["tabular-nums"] },
-                ]}
-              >
-                {result.carbs}г
-              </Text>
-            </View>
+            {macros.map((macro, index, arr) => (
+              <React.Fragment key={macro.label}>
+                <View style={styles.kbjvItem}>
+                  <Text
+                    style={[styles.kbjvLabel, { color: colors.secondaryLabel }]}
+                  >
+                    {macro.label}
+                  </Text>
+                  <Text
+                    style={[
+                      styles.kbjvValue,
+                      { color: colors.label, fontVariant: ["tabular-nums"] },
+                    ]}
+                  >
+                    {macro.value}
+                    {macro.suffix}
+                  </Text>
+                </View>
+                {index < arr.length - 1 && (
+                  <View
+                    style={[
+                      styles.kbjvDivider,
+                      { backgroundColor: colors.separator },
+                    ]}
+                  />
+                )}
+              </React.Fragment>
+            ))}
           </View>
         </View>
       </Card>
