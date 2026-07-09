@@ -1,3 +1,4 @@
+import { AnalyzeResponse } from "@/types/analyze";
 import { ImageManipulator, SaveFormat } from "expo-image-manipulator";
 import {
   AnalysisConfidence,
@@ -61,7 +62,7 @@ export async function analyzeFoodImageBackend(
       throw new Error(errorMsg);
     }
 
-    const data = await response.json();
+    const data: AnalyzeResponse = await response.json();
 
     const userAllergies = (profile.allergies || []).map((a) => a.toLowerCase());
     const allergyAlerts: string[] = [];
@@ -94,7 +95,7 @@ export async function analyzeFoodImageBackend(
       protein: safeNumber(data.total.protein),
       fat: safeNumber(data.total.fat),
       carbs: safeNumber(data.total.carbs),
-      ingredients: data.detected_food.map((food: any) => ({
+      ingredients: data.detected_food.map((food) => ({
         name: food.name,
         weight: food.estimated_weight || "Невідомо",
         confidence: food.estimated_weight_confidence as
@@ -105,7 +106,7 @@ export async function analyzeFoodImageBackend(
       risks: Array.isArray(data.bad_points) ? data.bad_points : [],
       summary: data.personalized_summary || "",
     };
-  } catch (error: any) {
+  } catch (error) {
     throw error;
   }
 }
