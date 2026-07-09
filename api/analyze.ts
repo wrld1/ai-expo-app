@@ -21,10 +21,10 @@ export async function analyzeFoodImageBackend(
     const imageRef = await ImageManipulator.manipulate(imageUri)
       .resize({ width: 800 })
       .renderAsync();
-      
-    const manipResult = await imageRef.saveAsync({ 
-      compress: 0.7, 
-      format: SaveFormat.JPEG 
+
+    const manipResult = await imageRef.saveAsync({
+      compress: 0.7,
+      format: SaveFormat.JPEG,
     });
     finalUri = manipResult.uri;
   } catch (err) {
@@ -61,14 +61,14 @@ export async function analyzeFoodImageBackend(
       throw new Error(errorMsg);
     }
 
-    const data: any = await response.json();
+    const data = await response.json();
 
     const userAllergies = (profile.allergies || []).map((a) => a.toLowerCase());
     const allergyAlerts: string[] = [];
 
     if (userAllergies.length > 0) {
       for (const food of data.detected_food) {
-        const foodNameLower = (food as any).name.toLowerCase();
+        const foodNameLower = food.name.toLowerCase();
         for (const allergy of userAllergies) {
           if (foodNameLower.includes(allergy)) {
             if (!allergyAlerts.includes(allergy)) {

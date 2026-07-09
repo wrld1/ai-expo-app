@@ -1,4 +1,5 @@
-import React from "react";
+import Ionicons from "@react-native-vector-icons/ionicons";
+import React, { ComponentProps } from "react";
 import { StyleSheet, Text, View } from "react-native";
 import { colors } from "../../constants/theme";
 import NativeIcon from "../ui/NativeIcon";
@@ -19,7 +20,7 @@ export default function AlertCard({
   let themeColor = colors.systemYellow;
   let bgColor = "rgba(255, 204, 0, 0.1)";
   let sfIcon = "exclamationmark.triangle.fill";
-  let ionIcon = "warning";
+  let ionIcon: ComponentProps<typeof Ionicons>["name"] = "warning";
 
   if (variant === "danger") {
     themeColor = colors.systemRed;
