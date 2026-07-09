@@ -1,4 +1,4 @@
-import * as ImageManipulator from "expo-image-manipulator";
+import { ImageManipulator, SaveFormat } from "expo-image-manipulator";
 import {
   AnalysisConfidence,
   AnalysisWarning,
@@ -18,11 +18,14 @@ export async function analyzeFoodImageBackend(
 
   let finalUri = imageUri;
   try {
-    const manipResult = await ImageManipulator.manipulateAsync(
-      imageUri,
-      [{ resize: { width: 800 } }],
-      { compress: 0.7, format: ImageManipulator.SaveFormat.JPEG },
-    );
+    const imageRef = await ImageManipulator.manipulate(imageUri)
+      .resize({ width: 800 })
+      .renderAsync();
+      
+    const manipResult = await imageRef.saveAsync({ 
+      compress: 0.7, 
+      format: SaveFormat.JPEG 
+    });
     finalUri = manipResult.uri;
   } catch (err) {
     console.warn("Failed to compress image, using original:", err);

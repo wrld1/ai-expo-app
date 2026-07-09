@@ -9,11 +9,10 @@ import {
   View,
 } from "react-native";
 import { colors } from "../../constants/theme";
+import { triggerHapticLight } from "../../utils/haptics";
 import Divider from "../ui/Divider";
 import ChipsGroup from "./ChipsGroup";
 import SettingsRow from "./SettingsRow";
-
-import { triggerHapticLight } from "../../utils/haptics";
 
 interface AllergiesSectionProps {
   value: string[];

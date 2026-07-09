@@ -1,6 +1,6 @@
 import { Image } from "expo-image";
 import { useLocalSearchParams, useRouter } from "expo-router";
-import React, { useMemo } from "react";
+import React from "react";
 import {
   ScrollView,
   StyleSheet,
@@ -22,7 +22,7 @@ export default function HistoryModalScreen() {
   const { history, deleteHistoryItem } = useHistory();
   const router = useRouter();
 
-  const item = useMemo(() => history.find((h) => h.id === id), [history, id]);
+  const item = history.find((h) => h.id === id);
 
   if (!item) {
     return (
