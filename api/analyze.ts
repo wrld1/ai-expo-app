@@ -1,5 +1,4 @@
 import * as ImageManipulator from "expo-image-manipulator";
-import { Platform } from "react-native";
 import {
   AnalysisConfidence,
   AnalysisWarning,
@@ -8,10 +7,7 @@ import {
 import { ProfileData } from "../types/profile";
 
 const API_URL =
-  process.env.EXPO_PUBLIC_API_URL ||
-  (Platform.OS === "android"
-    ? "http://10.0.2.2:3000/api/analyze"
-    : "http://localhost:3000/api/analyze");
+  (process.env.EXPO_PUBLIC_API_URL || "http://localhost:3000") + "/api/analyze";
 
 export async function analyzeFoodImageBackend(
   imageUri: string,
@@ -102,12 +98,8 @@ export async function analyzeFoodImageBackend(
           | AnalysisConfidence
           | undefined,
       })),
-      whatIsGood: Array.isArray(data.good_points)
-        ? data.good_points
-        : [],
-      risks: Array.isArray(data.bad_points)
-        ? data.bad_points
-        : [],
+      whatIsGood: Array.isArray(data.good_points) ? data.good_points : [],
+      risks: Array.isArray(data.bad_points) ? data.bad_points : [],
       summary: data.personalized_summary || "",
     };
   } catch (error: any) {

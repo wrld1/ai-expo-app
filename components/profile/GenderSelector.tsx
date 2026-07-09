@@ -1,25 +1,24 @@
+import { GENDERS } from "@/constants/profile";
 import React from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { colors } from "../../constants/theme";
 import { triggerHapticLight } from "../../utils/haptics";
 import SettingsRow from "./SettingsRow";
 
-const GENDERS = ["Чоловіча", "Жіноча", "Інша"] as const;
-
 interface GenderSelectorProps {
-  selected: string;
-  onSelect: (gender: string) => void;
+  value: string;
+  onChange: (gender: string) => void;
 }
 
 export default function GenderSelector({
-  selected,
-  onSelect,
+  value,
+  onChange,
 }: GenderSelectorProps) {
   return (
     <SettingsRow label="Стать" style={{ paddingVertical: 8 }}>
       <View style={styles.segmentedControl}>
         {GENDERS.map((g) => {
-          const isSelected = selected === g;
+          const isSelected = value === g;
           return (
             <TouchableOpacity
               key={g}
@@ -29,7 +28,7 @@ export default function GenderSelector({
               ]}
               onPress={() => {
                 triggerHapticLight();
-                onSelect(g);
+                onChange(g);
               }}
               activeOpacity={0.8}
             >

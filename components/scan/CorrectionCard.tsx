@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import {
   ActivityIndicator,
+  Platform,
   StyleSheet,
   Text,
   TextInput,
@@ -32,7 +33,8 @@ export default function CorrectionCard({
       style={[
         styles.correctionCardOverrides,
         {
-          borderColor: "rgba(44, 226, 162, 0.15)",
+          borderColor: colors.separator,
+          backgroundColor: colors.systemGroupedBackground,
         },
       ]}
     >
@@ -65,21 +67,22 @@ export default function CorrectionCard({
           style={[
             styles.sendCorrectionBtn,
             { backgroundColor: colors.accent },
-            (!text.trim() || isCorrecting) &&
-              styles.sendCorrectionBtnDisabled,
+            (!text.trim() || isCorrecting) && styles.sendCorrectionBtnDisabled,
           ]}
           onPress={handleSubmit}
           disabled={!text.trim() || isCorrecting}
           activeOpacity={0.8}
         >
           {isCorrecting ? (
-            <ActivityIndicator size="small" color="#121417" />
+            <ActivityIndicator size="small" color={colors.secondaryLabel} />
           ) : (
             <NativeIcon
               sf="paperplane.fill"
               ion="send"
               size={18}
-              color="#121417"
+              color={
+                !text.trim() || isCorrecting ? colors.placeholder : "#121417"
+              }
             />
           )}
         </TouchableOpacity>
@@ -104,20 +107,22 @@ const styles = StyleSheet.create({
   },
   correctionInputContainer: {
     flexDirection: "row",
-    backgroundColor: "rgba(255, 255, 255, 0.03)",
+    backgroundColor: colors.secondarySystemGroupedBackground,
     borderRadius: 10,
     borderCurve: "continuous",
     borderWidth: 1,
-    alignItems: "flex-end",
-    paddingRight: 6,
-    paddingBottom: 6,
+    alignItems: "center",
+    paddingHorizontal: 6,
+    paddingVertical: 6,
   },
   correctionInput: {
     flex: 1,
     fontSize: 14,
-    padding: 10,
+    paddingHorizontal: 10,
+    paddingTop: Platform.OS === "ios" ? 10 : 8,
+    paddingBottom: Platform.OS === "ios" ? 10 : 8,
+    minHeight: 36,
     maxHeight: 80,
-    textAlignVertical: "top",
   },
   sendCorrectionBtn: {
     borderRadius: 8,
@@ -129,8 +134,6 @@ const styles = StyleSheet.create({
     marginLeft: 6,
   },
   sendCorrectionBtnDisabled: {
-    backgroundColor: "rgba(255,255,255,0.02)",
-    borderWidth: 1,
-    borderColor: "rgba(255,255,255,0.04)",
+    backgroundColor: "transparent",
   },
 });

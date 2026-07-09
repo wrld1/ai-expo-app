@@ -8,6 +8,7 @@ import {
   View,
 } from "react-native";
 import { CONCERN_PRESETS } from "@/constants/profile";
+import { Controller } from "react-hook-form";
 import { colors } from "../../constants/theme";
 import { useProfileForm } from "../../hooks/useProfileForm";
 import Button from "../ui/Button";
@@ -19,24 +20,8 @@ import FormSection from "./FormSection";
 import GenderSelector from "./GenderSelector";
 
 export default function ProfileView() {
-  const {
-    age,
-    gender,
-    allergies,
-    concerns,
-    customAllergy,
-    setCustomAllergy,
-    showAgePicker,
-    toggleAgePicker,
-    isSaving,
-    setAge,
-    setGender,
-    toggleAllergy,
-    addCustomAllergy,
-    removeAllergy,
-    toggleConcern,
-    onSubmit,
-  } = useProfileForm();
+  const { form, isSaving, onSubmit } = useProfileForm();
+  const { control } = form;
 
   return (
     <KeyboardAvoidingView
@@ -48,24 +33,30 @@ export default function ProfileView() {
         contentContainerStyle={styles.scrollContent}
       >
         <FormSection title="Персональні дані">
-          <AgePicker
-            age={age}
-            showPicker={showAgePicker}
-            onTogglePicker={toggleAgePicker}
-            onAgeChange={setAge}
+          <Controller
+            control={control}
+            name="age"
+            render={({ field }) => (
+              <AgePicker value={field.value} onChange={field.onChange} />
+            )}
           />
           <Divider />
-          <GenderSelector selected={gender} onSelect={setGender} />
+          <Controller
+            control={control}
+            name="gender"
+            render={({ field }) => (
+              <GenderSelector value={field.value} onChange={field.onChange} />
+            )}
+          />
         </FormSection>
 
         <FormSection title="Алергії та обмеження">
-          <AllergiesSection
-            allergies={allergies}
-            customAllergy={customAllergy}
-            setCustomAllergy={setCustomAllergy}
-            onToggle={toggleAllergy}
-            onAdd={addCustomAllergy}
-            onRemove={removeAllergy}
+          <Controller
+            control={control}
+            name="allergies"
+            render={({ field }) => (
+              <AllergiesSection value={field.value || []} onChange={field.onChange} />
+            )}
           />
         </FormSection>
 
@@ -74,10 +65,16 @@ export default function ProfileView() {
             <Text style={[styles.rowSubText, { color: colors.secondaryLabel }]}>
               На чому сфокусувати увагу AI при аналізі?
             </Text>
-            <ChipsGroup
-              presets={CONCERN_PRESETS}
-              selectedValues={concerns}
-              onToggle={toggleConcern}
+            <Controller
+              control={control}
+              name="concerns"
+              render={({ field }) => (
+                <ChipsGroup
+                  presets={CONCERN_PRESETS}
+                  value={field.value || []}
+                  onChange={field.onChange}
+                />
+              )}
             />
           </View>
         </FormSection>

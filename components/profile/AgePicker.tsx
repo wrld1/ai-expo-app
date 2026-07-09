@@ -1,39 +1,36 @@
+import { AGE_VALUES } from "@/constants/profile";
 import { Picker } from "@react-native-picker/picker";
-import React from "react";
+import React, { useState } from "react";
 import { Platform, StyleSheet, View } from "react-native";
 import { colors } from "../../constants/theme";
 import { triggerHapticLight } from "../../utils/haptics";
-import Divider from "../ui/Divider";
 import SettingsRow from "./SettingsRow";
 
-const AGE_VALUES = Array.from({ length: 100 }, (_, i) => String(i + 1));
-
 interface AgePickerProps {
-  age: string;
-  showPicker: boolean;
-  onTogglePicker: () => void;
-  onAgeChange: (age: string) => void;
+  value: string;
+  onChange: (age: string) => void;
 }
 
-export default function AgePicker({ age, showPicker, onTogglePicker, onAgeChange }: AgePickerProps) {
+export default function AgePicker({ value, onChange }: AgePickerProps) {
+  const [showPicker, setShowPicker] = useState(false);
   if (Platform.OS === "ios") {
     return (
       <>
         <SettingsRow
           label="Вік"
-          value={`${age} років`}
+          value={`${value} років`}
           onPress={() => {
             triggerHapticLight();
-            onTogglePicker();
+            setShowPicker((prev) => !prev);
           }}
         />
         {showPicker && (
           <View style={styles.pickerContainer}>
             <Picker
-              selectedValue={age}
+              selectedValue={value}
               onValueChange={(val) => {
                 triggerHapticLight();
-                onAgeChange(val);
+                onChange(val);
               }}
               style={{ color: colors.label }}
             >
@@ -51,14 +48,19 @@ export default function AgePicker({ age, showPicker, onTogglePicker, onAgeChange
     <SettingsRow label="Вік">
       <View style={styles.pickerWrapperAndroid}>
         <Picker
-          selectedValue={age}
-          onValueChange={onAgeChange}
+          selectedValue={value}
+          onValueChange={onChange}
           style={{ color: colors.label, width: 140 }}
           dropdownIconColor={colors.secondaryLabel as string}
           mode="dropdown"
         >
           {AGE_VALUES.map((val) => (
-            <Picker.Item key={val} label={`${val} р.`} value={val} color="#1C1C1E" />
+            <Picker.Item
+              key={val}
+              label={`${val} р.`}
+              value={val}
+              color="#1C1C1E"
+            />
           ))}
         </Picker>
       </View>
@@ -69,7 +71,6 @@ export default function AgePicker({ age, showPicker, onTogglePicker, onAgeChange
 const styles = StyleSheet.create({
   pickerContainer: {
     backgroundColor: "rgba(255, 255, 255, 0.02)",
-    marginTop: -6,
     marginBottom: 8,
     borderRadius: 8,
     overflow: "hidden",

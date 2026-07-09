@@ -21,11 +21,9 @@ export type ProfileFormData = z.infer<typeof profileSchema>;
 
 export function useProfileForm() {
   const { profile, updateProfile } = useProfile();
-  const [showAgePicker, setShowAgePicker] = useState(false);
-  const [customAllergy, setCustomAllergy] = useState("");
   const [isSaving, setIsSaving] = useState(false);
 
-  const { handleSubmit, setValue, watch, reset } = useForm<ProfileFormData>({
+  const form = useForm<ProfileFormData>({
     resolver: zodResolver(profileSchema),
     defaultValues: {
       age: "25",
@@ -36,51 +34,13 @@ export function useProfileForm() {
   });
 
   useEffect(() => {
-    reset({
+    form.reset({
       age: profile.age || "25",
       gender: profile.gender || "Інша",
       allergies: profile.allergies || [],
       concerns: profile.concerns || [],
     });
-  }, [profile, reset]);
-
-  const age = watch("age");
-  const gender = watch("gender");
-  const allergies = watch("allergies") || [];
-  const concerns = watch("concerns") || [];
-
-  const setAge = (val: string) => setValue("age", val, { shouldDirty: true });
-  const setGender = (val: string) => setValue("gender", val, { shouldDirty: true });
-
-  const toggleAllergy = (allergy: string) => {
-    triggerHapticLight();
-    const updated = allergies.includes(allergy)
-      ? allergies.filter((a) => a !== allergy)
-      : [...allergies, allergy];
-    setValue("allergies", updated, { shouldDirty: true });
-  };
-
-  const addCustomAllergy = () => {
-    const trimmed = customAllergy.trim();
-    if (trimmed && !allergies.includes(trimmed)) {
-      triggerHapticLight();
-      setValue("allergies", [...allergies, trimmed], { shouldDirty: true });
-      setCustomAllergy("");
-    }
-  };
-
-  const removeAllergy = (allergy: string) => {
-    triggerHapticLight();
-    setValue("allergies", allergies.filter((a) => a !== allergy), { shouldDirty: true });
-  };
-
-  const toggleConcern = (concern: string) => {
-    triggerHapticLight();
-    const updated = concerns.includes(concern)
-      ? concerns.filter((c) => c !== concern)
-      : [...concerns, concern];
-    setValue("concerns", updated, { shouldDirty: true });
-  };
+  }, [profile, form]);
 
   const handleSave = async (data: ProfileFormData) => {
     setIsSaving(true);
@@ -97,21 +57,8 @@ export function useProfileForm() {
   };
 
   return {
-    age,
-    gender,
-    allergies,
-    concerns,
-    customAllergy,
-    setCustomAllergy,
-    showAgePicker,
-    toggleAgePicker: () => setShowAgePicker((v) => !v),
+    form,
     isSaving,
-    setAge,
-    setGender,
-    toggleAllergy,
-    addCustomAllergy,
-    removeAllergy,
-    toggleConcern,
-    onSubmit: handleSubmit(handleSave),
+    onSubmit: form.handleSubmit(handleSave),
   };
 }

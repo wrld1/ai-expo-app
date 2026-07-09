@@ -1,3 +1,4 @@
+import { ALLERGY_PRESETS } from "@/constants/profile";
 import Ionicons from "@react-native-vector-icons/ionicons";
 import React from "react";
 import {
@@ -7,30 +8,39 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import { ALLERGY_PRESETS } from "@/constants/profile";
 import { colors } from "../../constants/theme";
 import Divider from "../ui/Divider";
 import ChipsGroup from "./ChipsGroup";
 import SettingsRow from "./SettingsRow";
 
+import { triggerHapticLight } from "../../utils/haptics";
+
 interface AllergiesSectionProps {
-  allergies: string[];
-  customAllergy: string;
-  setCustomAllergy: (val: string) => void;
-  onToggle: (val: string) => void;
-  onAdd: () => void;
-  onRemove: (val: string) => void;
+  value: string[];
+  onChange: (val: string[]) => void;
 }
 
 export default function AllergiesSection({
-  allergies,
-  customAllergy,
-  setCustomAllergy,
-  onToggle,
-  onAdd,
-  onRemove,
+  value,
+  onChange,
 }: AllergiesSectionProps) {
-  const customAllergies = allergies.filter((a) => !ALLERGY_PRESETS.includes(a));
+  const [customAllergy, setCustomAllergy] = React.useState("");
+
+  const add = () => {
+    const trimmed = customAllergy.trim();
+    if (trimmed && !value.includes(trimmed)) {
+      triggerHapticLight();
+      onChange([...value, trimmed]);
+      setCustomAllergy("");
+    }
+  };
+
+  const remove = (allergy: string) => {
+    triggerHapticLight();
+    onChange(value.filter((v) => v !== allergy));
+  };
+
+  const customAllergies = value.filter((a) => !ALLERGY_PRESETS.includes(a));
 
   return (
     <>
@@ -40,8 +50,8 @@ export default function AllergiesSection({
         </Text>
         <ChipsGroup
           presets={ALLERGY_PRESETS}
-          selectedValues={allergies}
-          onToggle={onToggle}
+          value={value}
+          onChange={onChange}
         />
       </View>
 
@@ -54,12 +64,12 @@ export default function AllergiesSection({
           onChangeText={setCustomAllergy}
           placeholder="Додати свій алерген..."
           placeholderTextColor={colors.placeholder}
-          onSubmitEditing={onAdd}
+          onSubmitEditing={add}
           returnKeyType="done"
         />
         <TouchableOpacity
           style={[styles.addBtn, { backgroundColor: colors.accent }]}
-          onPress={onAdd}
+          onPress={add}
           activeOpacity={0.8}
         >
           <Ionicons name="add" size={20} color="#121417" />
@@ -70,7 +80,9 @@ export default function AllergiesSection({
         <>
           <Divider />
           <View style={styles.chipsContainerRow}>
-            <Text style={[styles.rowSubLabel, { color: colors.secondaryLabel }]}>
+            <Text
+              style={[styles.rowSubLabel, { color: colors.secondaryLabel }]}
+            >
               Ваші додаткові алергени:
             </Text>
             <View style={styles.chipsRow}>
@@ -79,10 +91,12 @@ export default function AllergiesSection({
                   key={allergy}
                   style={[styles.customChip, { borderColor: colors.systemRed }]}
                 >
-                  <Text style={[styles.customChipText, { color: colors.label }]}>
+                  <Text
+                    style={[styles.customChipText, { color: colors.label }]}
+                  >
                     {allergy}
                   </Text>
-                  <TouchableOpacity onPress={() => onRemove(allergy)}>
+                  <TouchableOpacity onPress={() => remove(allergy)}>
                     <Ionicons
                       name="close-circle"
                       size={16}

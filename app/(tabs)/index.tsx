@@ -155,15 +155,14 @@ const styles = StyleSheet.create({
     backgroundColor: "rgba(255, 255, 255, 0.02)",
     borderRadius: 10,
     borderCurve: "continuous",
-    paddingLeft: 10,
-    paddingRight: 10,
-    marginBottom: 12,
+    padding: 4,
+    marginBottom: 16,
     alignItems: "flex-start",
   },
   warningText: {
     fontSize: 11,
     lineHeight: 15,
     marginLeft: 8,
-    flex: 1,
+    flexShrink: 1,
   },
 });

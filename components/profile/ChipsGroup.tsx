@@ -1,18 +1,28 @@
 import React from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { colors } from "../../constants/theme";
+import { triggerHapticLight } from "../../utils/haptics";
 
 interface ChipsGroupProps {
   presets: string[];
-  selectedValues: string[];
-  onToggle: (val: string) => void;
+  value: string[];
+  onChange: (val: string[]) => void;
 }
 
-export default function ChipsGroup({ presets, selectedValues, onToggle }: ChipsGroupProps) {
+export default function ChipsGroup({ presets, value, onChange }: ChipsGroupProps) {
+  const toggle = (item: string) => {
+    triggerHapticLight();
+    if (value.includes(item)) {
+      onChange(value.filter((v) => v !== item));
+    } else {
+      onChange([...value, item]);
+    }
+  };
+
   return (
     <View style={styles.chipsRow}>
       {presets.map((item) => {
-        const isSelected = selectedValues.includes(item);
+        const isSelected = value.includes(item);
         return (
           <TouchableOpacity
             key={item}
@@ -20,7 +30,7 @@ export default function ChipsGroup({ presets, selectedValues, onToggle }: ChipsG
               styles.chip,
               isSelected && [styles.chipSelected, { borderColor: colors.accent }],
             ]}
-            onPress={() => onToggle(item)}
+            onPress={() => toggle(item)}
             activeOpacity={0.8}
           >
             <Text
