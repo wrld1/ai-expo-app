@@ -2,6 +2,7 @@ import React from "react";
 import { StyleSheet, Text, View } from "react-native";
 import { colors } from "../../constants/theme";
 import { HistoryItem } from "../../types/history";
+import { formatUkDate } from "../../utils/date";
 import Card from "../ui/Card";
 
 interface CorrectionHistoryListProps {
@@ -21,11 +22,19 @@ export default function CorrectionHistoryList({
       {history.map((corr, idx) => (
         <Card key={idx} style={styles.correctionHistoryRowOverrides}>
           <View style={styles.corrUserBubble}>
+            <Text style={[styles.corrUserLabel, { color: colors.label }]}>
+              {"Коригування: "}
+            </Text>
             <Text style={[styles.corrUserText, { color: colors.label }]}>
-              {'Коригування: "'}
+              {'"'}
               {corr.userPrompt}
               {'"'}
             </Text>
+            {corr.timestamp && (
+              <Text style={styles.corrTimestampText}>
+                {formatUkDate(corr.timestamp)}
+              </Text>
+            )}
           </View>
           <View
             style={[
@@ -33,10 +42,18 @@ export default function CorrectionHistoryList({
               { backgroundColor: "rgba(44, 226, 162, 0.08)" },
             ]}
           >
-            <Text style={[styles.corrAiText, { color: colors.accent }]}>
-              AI оновив страву на: {corr.result.foodName} (
-              {corr.result.calories} ккал)
-            </Text>
+            {corr.resultBefore ? (
+              <Text style={[styles.corrAiText, { color: colors.accent }]}>
+                AI оновив страву: {corr.resultBefore.foodName} (
+                {corr.resultBefore.calories} ккал) ➔ {corr.result.foodName} (
+                {corr.result.calories} ккал)
+              </Text>
+            ) : (
+              <Text style={[styles.corrAiText, { color: colors.accent }]}>
+                AI оновив страву на: {corr.result.foodName} (
+                {corr.result.calories} ккал)
+              </Text>
+            )}
           </View>
         </Card>
       ))}
@@ -56,14 +73,26 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   corrUserBubble: {
-    backgroundColor: "rgba(255, 255, 255, 0.04)",
-    padding: 8,
+    paddingBottom: 8,
+    paddingHorizontal: 8,
     borderRadius: 8,
-    marginBottom: 6,
+    display: "flex",
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  corrUserLabel: {
+    fontSize: 12,
+    fontWeight: "600",
   },
   corrUserText: {
     fontSize: 12,
     fontStyle: "italic",
+  },
+  corrTimestampText: {
+    fontSize: 10,
+    marginTop: 4,
+    color: "#8E8E93",
+    marginLeft: 8,
   },
   corrAiBubble: {
     padding: 8,

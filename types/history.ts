@@ -32,5 +32,10 @@ export interface HistoryItem {
   date: string;
   imageUri: string;
   result: ScanResult;
-  correctionHistory?: Array<{ userPrompt: string; result: ScanResult }>;
+  correctionHistory?: Array<{ 
+    userPrompt: string; 
+    result: ScanResult;
+    resultBefore?: ScanResult;
+    timestamp?: string;
+  }>;
 }

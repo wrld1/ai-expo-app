@@ -57,7 +57,15 @@ export const HistoryProvider: React.FC<{ children: React.ReactNode }> = ({ child
         return {
           ...item,
           result: newResult,
-          correctionHistory: [...correctionHistory, { userPrompt: correctionText, result: newResult }],
+          correctionHistory: [
+            ...correctionHistory, 
+            { 
+              userPrompt: correctionText, 
+              result: newResult,
+              resultBefore: item.result,
+              timestamp: new Date().toISOString()
+            }
+          ],
         };
       }
       return item;
