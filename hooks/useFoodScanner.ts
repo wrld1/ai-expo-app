@@ -20,7 +20,6 @@ export function useFoodScanner() {
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [scanResult, setScanResult] = useState<ScanResult | null>(null);
   const [historyId, setHistoryId] = useState<string | null>(null);
-  const [correctionText, setCorrectionText] = useState("");
   const [isCorrecting, setIsCorrecting] = useState(false);
 
   const requestPermissions = async () => {
@@ -61,7 +60,6 @@ export function useFoodScanner() {
         setImageUri(result.assets[0].uri);
         setScanResult(null);
         setHistoryId(null);
-        setCorrectionText("");
       }
     } catch (error) {
       console.error(`${source} failed`, error);
@@ -96,7 +94,7 @@ export function useFoodScanner() {
     }
   };
 
-  const handleCorrection = async () => {
+  const handleCorrection = async (correctionText: string) => {
     if (!imageUri || !scanResult || !historyId || !correctionText.trim()) return;
 
     triggerHapticMedium();
@@ -110,7 +108,6 @@ export function useFoodScanner() {
 
       setScanResult(updatedResult);
       await updateHistoryItemResult(historyId, updatedResult, correctionText.trim());
-      setCorrectionText("");
       triggerHapticSuccess();
       Alert.alert("Успіх", "Аналіз страви успішно оновлено!");
     } catch (error: any) {
@@ -129,16 +126,14 @@ export function useFoodScanner() {
     setImageUri(null);
     setScanResult(null);
     setHistoryId(null);
-    setCorrectionText("");
   };
 
   return {
     imageUri,
     isAnalyzing,
     scanResult,
-    correctionText,
     isCorrecting,
-    setCorrectionText,
+    canCorrect: historyId !== null,
     handleImagePick,
     handleAnalyze,
     handleCorrection,

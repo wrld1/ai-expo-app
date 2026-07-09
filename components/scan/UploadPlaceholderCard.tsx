@@ -1,8 +1,9 @@
 import React from "react";
-import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { StyleSheet, Text, View } from "react-native";
 import Animated, { FadeInUp } from "react-native-reanimated";
 import { colors } from "../../constants/theme";
 import NativeIcon from "../ui/NativeIcon";
+import Button from "../ui/Button";
 
 interface UploadPlaceholderCardProps {
   onTakePhoto: () => void;
@@ -45,45 +46,21 @@ export default function UploadPlaceholderCard({
         </Text>
 
         <View style={styles.actionButtonsRow}>
-          <TouchableOpacity
-            style={[
-              styles.actionBtn,
-              styles.cameraBtn,
-              { backgroundColor: colors.accent },
-            ]}
+          <Button
+            title="Камера"
+            variant="default"
+            icon={<NativeIcon sf="camera.fill" ion="camera" size={20} color="#121417" />}
             onPress={onTakePhoto}
-            activeOpacity={0.8}
-          >
-            <NativeIcon
-              sf="camera.fill"
-              ion="camera"
-              size={20}
-              color="#121417"
-            />
-            <Text style={styles.actionBtnTextDark}>Камера</Text>
-          </TouchableOpacity>
+            style={{ flex: 1, marginHorizontal: 4 }}
+          />
 
-          <TouchableOpacity
-            style={[
-              styles.actionBtn,
-              styles.galleryBtn,
-              { borderColor: "rgba(44, 226, 162, 0.3)" },
-            ]}
+          <Button
+            title="Галерея"
+            variant="outline"
+            icon={<NativeIcon sf="photo.fill" ion="image" size={20} color={colors.accent} />}
             onPress={onPickImage}
-            activeOpacity={0.8}
-          >
-            <NativeIcon
-              sf="photo.fill"
-              ion="image"
-              size={20}
-              color={colors.accent}
-            />
-            <Text
-              style={[styles.actionBtnTextLight, { color: colors.accent }]}
-            >
-              Галерея
-            </Text>
-          </TouchableOpacity>
+            style={{ flex: 1, marginHorizontal: 4 }}
+          />
         </View>
       </View>
     </Animated.View>
@@ -122,31 +99,5 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     width: "100%",
-  },
-  actionBtn: {
-    flex: 1,
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    paddingVertical: 12,
-    borderRadius: 10,
-    borderCurve: "continuous",
-    marginHorizontal: 4,
-  },
-  cameraBtn: {},
-  galleryBtn: {
-    backgroundColor: "transparent",
-    borderWidth: 1,
-  },
-  actionBtnTextDark: {
-    color: "#121417",
-    fontSize: 14,
-    fontWeight: "700",
-    marginLeft: 6,
-  },
-  actionBtnTextLight: {
-    fontSize: 14,
-    fontWeight: "700",
-    marginLeft: 6,
   },
 });

@@ -3,8 +3,8 @@ import { ProfileData } from "../types/profile";
 
 const getBackendUrl = () => {
   return (
-    process.env.EXPO_PUBLIC_API_URL + "/api/analyze" ||
-    "http://localhost:3000/api/analyze"
+    (process.env.EXPO_PUBLIC_API_URL || "http://localhost:3000") +
+    "/api/analyze"
   );
 };
 
@@ -58,10 +58,12 @@ export async function analyzeFoodImageBackend(
     protein: safeNumber(rawResult.total?.protein),
     fat: safeNumber(rawResult.total?.fat),
     carbs: safeNumber(rawResult.total?.carbs),
-    ingredients: (rawResult.detected_food || []).map((food: { name: string; estimated_weight?: string }) => ({
-      name: food.name,
-      weight: food.estimated_weight || "Невідомо",
-    })),
+    ingredients: (rawResult.detected_food || []).map(
+      (food: { name: string; estimated_weight?: string }) => ({
+        name: food.name,
+        weight: food.estimated_weight || "Невідомо",
+      }),
+    ),
     whatIsGood:
       rawResult.good_points?.map((p: string) => `• ${p}`).join("\n") ||
       "Немає даних",

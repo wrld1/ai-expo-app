@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   ActivityIndicator,
   StyleSheet,
@@ -12,18 +12,21 @@ import Card from "../ui/Card";
 import NativeIcon from "../ui/NativeIcon";
 
 interface CorrectionCardProps {
-  correctionText: string;
-  setCorrectionText: (text: string) => void;
   isCorrecting: boolean;
-  onCorrectionSubmit: () => void;
+  onCorrectionSubmit: (text: string) => void;
 }
 
 export default function CorrectionCard({
-  correctionText,
-  setCorrectionText,
   isCorrecting,
   onCorrectionSubmit,
 }: CorrectionCardProps) {
+  const [text, setText] = useState("");
+
+  const handleSubmit = () => {
+    if (!text.trim() || isCorrecting) return;
+    onCorrectionSubmit(text.trim());
+    setText("");
+  };
   return (
     <Card
       style={[
@@ -52,8 +55,8 @@ export default function CorrectionCard({
       >
         <TextInput
           style={[styles.correctionInput, { color: colors.label }]}
-          value={correctionText}
-          onChangeText={setCorrectionText}
+          value={text}
+          onChangeText={setText}
           placeholder="Напишіть уточнення тут..."
           placeholderTextColor={colors.placeholder}
           multiline
@@ -62,11 +65,11 @@ export default function CorrectionCard({
           style={[
             styles.sendCorrectionBtn,
             { backgroundColor: colors.accent },
-            (!correctionText.trim() || isCorrecting) &&
+            (!text.trim() || isCorrecting) &&
               styles.sendCorrectionBtnDisabled,
           ]}
-          onPress={onCorrectionSubmit}
-          disabled={!correctionText.trim() || isCorrecting}
+          onPress={handleSubmit}
+          disabled={!text.trim() || isCorrecting}
           activeOpacity={0.8}
         >
           {isCorrecting ? (
