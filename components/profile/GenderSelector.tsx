@@ -1,5 +1,6 @@
 import React from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { colors } from "../../constants/theme";
 import { triggerHapticLight } from "../../utils/haptics";
 import SettingsRow from "./SettingsRow";
 
@@ -10,7 +11,10 @@ interface GenderSelectorProps {
   onSelect: (gender: string) => void;
 }
 
-export default function GenderSelector({ selected, onSelect }: GenderSelectorProps) {
+export default function GenderSelector({
+  selected,
+  onSelect,
+}: GenderSelectorProps) {
   return (
     <SettingsRow label="Стать" style={{ paddingVertical: 8 }}>
       <View style={styles.segmentedControl}>
@@ -19,14 +23,22 @@ export default function GenderSelector({ selected, onSelect }: GenderSelectorPro
           return (
             <TouchableOpacity
               key={g}
-              style={[styles.segmentButton, isSelected && styles.segmentButtonSelected]}
+              style={[
+                styles.segmentButton,
+                isSelected && styles.segmentButtonSelected,
+              ]}
               onPress={() => {
                 triggerHapticLight();
                 onSelect(g);
               }}
               activeOpacity={0.8}
             >
-              <Text style={[styles.segmentText, isSelected && styles.segmentTextSelected]}>
+              <Text
+                style={[
+                  styles.segmentText,
+                  isSelected && styles.segmentTextSelected,
+                ]}
+              >
                 {g}
               </Text>
             </TouchableOpacity>
@@ -40,11 +52,11 @@ export default function GenderSelector({ selected, onSelect }: GenderSelectorPro
 const styles = StyleSheet.create({
   segmentedControl: {
     flexDirection: "row",
-    backgroundColor: "rgba(255,255,255,0.04)",
+    backgroundColor: colors.secondarySystemGroupedBackground,
     borderRadius: 8,
     padding: 2,
     borderWidth: 1,
-    borderColor: "rgba(255,255,255,0.05)",
+    borderColor: colors.separator,
   },
   segmentButton: {
     paddingVertical: 6,
@@ -54,14 +66,14 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   segmentButtonSelected: {
-    backgroundColor: "rgba(255,255,255,0.12)",
+    backgroundColor: colors.systemGroupedBackground,
   },
   segmentText: {
-    color: "#8E8E93",
+    color: colors.secondaryLabel,
     fontSize: 13,
     fontWeight: "600",
   },
   segmentTextSelected: {
-    color: "#FFFFFF",
+    color: colors.label,
   },
 });

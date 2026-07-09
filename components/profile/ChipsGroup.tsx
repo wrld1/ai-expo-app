@@ -45,10 +45,10 @@ const styles = StyleSheet.create({
     marginHorizontal: -4,
   },
   chip: {
-    backgroundColor: "rgba(255,255,255,0.03)",
+    backgroundColor: colors.secondarySystemGroupedBackground,
     borderRadius: 18,
     borderWidth: 1,
-    borderColor: "rgba(255,255,255,0.08)",
+    borderColor: colors.separator,
     paddingHorizontal: 12,
     paddingVertical: 6,
     margin: 4,
@@ -57,7 +57,7 @@ const styles = StyleSheet.create({
     backgroundColor: "rgba(44, 226, 162, 0.08)",
   },
   chipText: {
-    color: "#8E8E93",
+    color: colors.secondaryLabel,
     fontSize: 13,
     fontWeight: "500",
   },

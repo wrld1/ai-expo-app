@@ -137,7 +137,7 @@ const styles = StyleSheet.create({
   customChip: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "rgba(255,255,255,0.04)",
+    backgroundColor: colors.secondarySystemGroupedBackground,
     borderRadius: 18,
     borderWidth: 1,
     paddingLeft: 12,
