@@ -30,11 +30,6 @@ export default function CorrectionHistoryList({
               {corr.userPrompt}
               {'"'}
             </Text>
-            {corr.timestamp && (
-              <Text style={styles.corrTimestampText}>
-                {formatUkDate(corr.timestamp)}
-              </Text>
-            )}
           </View>
           <View
             style={[
@@ -55,6 +50,11 @@ export default function CorrectionHistoryList({
               </Text>
             )}
           </View>
+          {corr.timestamp && (
+            <Text style={styles.corrTimestampText}>
+              {formatUkDate(corr.timestamp)}
+            </Text>
+          )}
         </Card>
       ))}
     </View>
@@ -90,9 +90,9 @@ const styles = StyleSheet.create({
   },
   corrTimestampText: {
     fontSize: 10,
-    marginTop: 4,
+    marginTop: 8,
     color: "#8E8E93",
-    marginLeft: 8,
+    marginLeft: "auto",
   },
   corrAiBubble: {
     padding: 8,

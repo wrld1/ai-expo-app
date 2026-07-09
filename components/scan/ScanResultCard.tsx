@@ -5,16 +5,18 @@ import { ScanResult } from "../../types/history";
 import Card from "../ui/Card";
 import Divider from "../ui/Divider";
 import NativeIcon from "../ui/NativeIcon";
+import ShimmerOverlay from "../ui/ShimmerOverlay";
 import AlertCard from "./AlertCard";
 import MacroProgress from "./MacroProgress";
 
 interface ScanResultCardProps {
   result: ScanResult;
+  isCorrecting?: boolean;
 }
 
-export default function ScanResultCard({ result }: ScanResultCardProps) {
+export default function ScanResultCard({ result, isCorrecting }: ScanResultCardProps) {
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, isCorrecting && { opacity: 0.8 }]}>
       <Card style={styles.resultHeaderCardOverrides}>
         <Text style={[nativeStyles.sectionTitle, { marginBottom: 4 }]}>
           Результат аналізу:
@@ -25,6 +27,7 @@ export default function ScanResultCard({ result }: ScanResultCardProps) {
         >
           {result.foodName}
         </Text>
+        {isCorrecting && <ShimmerOverlay />}
       </Card>
 
       {result.allergyAlerts && result.allergyAlerts.length > 0 && (
@@ -79,6 +82,7 @@ export default function ScanResultCard({ result }: ScanResultCardProps) {
         )}
 
       <Card style={styles.resultsCardOverrides}>
+        {isCorrecting && <ShimmerOverlay />}
         <Text
           style={[
             styles.resultsCardTitle,
@@ -117,6 +121,7 @@ export default function ScanResultCard({ result }: ScanResultCardProps) {
 
       {result.ingredients && result.ingredients.length > 0 && (
         <Card style={styles.resultsCardOverrides}>
+          {isCorrecting && <ShimmerOverlay />}
           <Text
             style={[
               styles.resultsCardTitle,
@@ -144,6 +149,7 @@ export default function ScanResultCard({ result }: ScanResultCardProps) {
       )}
 
       <Card style={styles.resultsCardOverrides}>
+        {isCorrecting && <ShimmerOverlay />}
         <Text style={[styles.resultsCardTitle, { color: colors.label }]}>
           Детальний аналіз
         </Text>

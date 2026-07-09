@@ -78,10 +78,6 @@ export default function HistoryModalScreen() {
           contentFit="cover"
         />
 
-        <Text style={[styles.modalDate, { color: colors.secondaryLabel }]}>
-          Проаналізовано: {formatUkDate(item.date)}
-        </Text>
-
         <ScanResultCard result={item.result} />
         <CorrectionHistoryList history={item.correctionHistory} />
 
@@ -104,6 +100,9 @@ export default function HistoryModalScreen() {
             }}
           />
         </View>
+        <Text style={[styles.modalDate, { color: colors.secondaryLabel }]}>
+          Проаналізовано: {formatUkDate(item.date)}
+        </Text>
       </ScrollView>
     </View>
   );
@@ -145,7 +144,7 @@ const styles = StyleSheet.create({
   },
   modalDate: {
     fontSize: 12,
-    marginBottom: 12,
+    marginTop: 12,
     textAlign: "center",
   },
   modalFooterActions: {

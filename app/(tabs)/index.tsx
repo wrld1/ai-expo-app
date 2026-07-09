@@ -96,7 +96,7 @@ export default function ScanScreen() {
             {scanResult && (
               <LayoutAnimationConfig skipEntering>
                 <Animated.View entering={FadeInUp}>
-                  <ScanResultCard result={scanResult} />
+                  <ScanResultCard result={scanResult} isCorrecting={isCorrecting} />
 
                   <View style={styles.warningCard}>
                     <NativeIcon
