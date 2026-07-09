@@ -4,6 +4,7 @@ import { ProfileData } from "../types/profile";
 
 interface ProfileContextType {
   profile: ProfileData;
+  isLoading: boolean;
   updateProfile: (updates: Partial<ProfileData>) => Promise<void>;
 }
 
@@ -22,6 +23,7 @@ export const ProfileProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
   const [profile, setProfile] = useState<ProfileData>(defaultProfile);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     loadProfile();
@@ -35,6 +37,8 @@ export const ProfileProvider: React.FC<{ children: React.ReactNode }> = ({
       }
     } catch (e) {
       console.error("Failed to load profile", e);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -53,7 +57,7 @@ export const ProfileProvider: React.FC<{ children: React.ReactNode }> = ({
   };
 
   return (
-    <ProfileContext.Provider value={{ profile, updateProfile }}>
+    <ProfileContext.Provider value={{ profile, isLoading, updateProfile }}>
       {children}
     </ProfileContext.Provider>
   );
