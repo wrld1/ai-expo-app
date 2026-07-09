@@ -22,8 +22,8 @@ export interface ScanResult {
   fat: number | null;
   carbs: number | null;
   ingredients: Ingredient[];
-  whatIsGood: string;
-  risks: string;
+  whatIsGood: string[];
+  risks: string[];
   summary: string;
 }
 

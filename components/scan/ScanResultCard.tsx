@@ -1,6 +1,7 @@
+import { getWarningText } from "@/constants/warning-text";
 import { StyleSheet, Text, View } from "react-native";
 import { colors, nativeStyles } from "../../constants/theme";
-import { AnalysisWarning, ScanResult } from "../../types/history";
+import { ScanResult } from "../../types/history";
 import Card from "../ui/Card";
 import Divider from "../ui/Divider";
 import NativeIcon from "../ui/NativeIcon";
@@ -10,21 +11,6 @@ import MacroProgress from "./MacroProgress";
 interface ScanResultCardProps {
   result: ScanResult;
 }
-
-const getWarningText = (warning: AnalysisWarning) => {
-  switch (warning) {
-    case "poor_image_quality":
-      return "Погана якість фото. Результати можуть бути неточними.";
-    case "multiple_dishes":
-      return "Виявлено кілька страв. Аналіз може бути узагальненим.";
-    case "hidden_ingredients":
-      return "Можливі приховані інгредієнти (наприклад, у соусі чи начинці).";
-    case "weight_estimation_uncertain":
-      return "Складно визначити точну вагу порції.";
-    default:
-      return "Увага: результати можуть бути неточними.";
-  }
-};
 
 export default function ScanResultCard({ result }: ScanResultCardProps) {
   return (
@@ -63,7 +49,12 @@ export default function ScanResultCard({ result }: ScanResultCardProps) {
           {result.warnings.map((w, idx) => (
             <Text
               key={idx}
-              style={{ color: colors.label, fontSize: 13, lineHeight: 18, marginBottom: 4 }}
+              style={{
+                color: colors.label,
+                fontSize: 13,
+                lineHeight: 18,
+                marginBottom: 4,
+              }}
             >
               • {getWarningText(w)}
             </Text>
@@ -74,8 +65,15 @@ export default function ScanResultCard({ result }: ScanResultCardProps) {
       {result.confidence === "low" &&
         (!result.warnings || result.warnings.length === 0) && (
           <AlertCard variant="info">
-            <Text style={{ color: colors.systemYellow, fontSize: 13, fontWeight: "600" }}>
-              Низька впевненість розпізнавання. Будь ласка, перевірте результати.
+            <Text
+              style={{
+                color: colors.systemYellow,
+                fontSize: 13,
+                fontWeight: "600",
+              }}
+            >
+              Низька впевненість розпізнавання. Будь ласка, перевірте
+              результати.
             </Text>
           </AlertCard>
         )}
@@ -157,12 +155,31 @@ export default function ScanResultCard({ result }: ScanResultCardProps) {
           </Text>
         </View>
         <View style={[nativeStyles.innerBox]}>
-          <Text
-            style={[styles.insightText, { color: colors.label }]}
-            selectable
-          >
-            {result.whatIsGood}
-          </Text>
+          {Array.isArray(result.whatIsGood) && result.whatIsGood.length > 0 ? (
+            result.whatIsGood.map((item, idx) => (
+              <Text
+                key={idx}
+                style={[styles.insightText, { color: colors.label, marginBottom: 4 }]}
+                selectable
+              >
+                • {item}
+              </Text>
+            ))
+          ) : typeof result.whatIsGood === "string" && result.whatIsGood ? (
+            <Text
+              style={[styles.insightText, { color: colors.label }]}
+              selectable
+            >
+              {result.whatIsGood}
+            </Text>
+          ) : (
+            <Text
+              style={[styles.insightText, { color: colors.secondaryLabel }]}
+              selectable
+            >
+              Немає даних
+            </Text>
+          )}
         </View>
 
         <View style={styles.sectionHeaderRow}>
@@ -182,12 +199,31 @@ export default function ScanResultCard({ result }: ScanResultCardProps) {
           </Text>
         </View>
         <View style={[nativeStyles.innerBox]}>
-          <Text
-            style={[styles.insightText, { color: colors.label }]}
-            selectable
-          >
-            {result.risks}
-          </Text>
+          {Array.isArray(result.risks) && result.risks.length > 0 ? (
+            result.risks.map((item, idx) => (
+              <Text
+                key={idx}
+                style={[styles.insightText, { color: colors.label, marginBottom: 4 }]}
+                selectable
+              >
+                • {item}
+              </Text>
+            ))
+          ) : typeof result.risks === "string" && result.risks ? (
+            <Text
+              style={[styles.insightText, { color: colors.label }]}
+              selectable
+            >
+              {result.risks}
+            </Text>
+          ) : (
+            <Text
+              style={[styles.insightText, { color: colors.secondaryLabel }]}
+              selectable
+            >
+              Немає даних
+            </Text>
+          )}
         </View>
 
         <View style={[styles.sectionHeaderRow, { marginTop: 16 }]}>

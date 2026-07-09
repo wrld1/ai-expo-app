@@ -103,11 +103,11 @@ export async function analyzeFoodImageBackend(
           | undefined,
       })),
       whatIsGood: Array.isArray(data.good_points)
-        ? data.good_points.map((p: any) => `• ${p}`).join("\n")
-        : "Немає даних",
+        ? data.good_points
+        : [],
       risks: Array.isArray(data.bad_points)
-        ? data.bad_points.map((p: any) => `• ${p}`).join("\n") || "Немає даних"
-        : "Немає даних",
+        ? data.bad_points
+        : [],
       summary: data.personalized_summary || "",
     };
   } catch (error: any) {

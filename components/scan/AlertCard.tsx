@@ -11,7 +11,11 @@ interface AlertCardProps {
   children: React.ReactNode;
 }
 
-export default function AlertCard({ variant, title, children }: AlertCardProps) {
+export default function AlertCard({
+  variant,
+  title,
+  children,
+}: AlertCardProps) {
   let themeColor = colors.systemYellow;
   let bgColor = "rgba(255, 204, 0, 0.1)";
   let sfIcon = "exclamationmark.triangle.fill";
@@ -50,7 +54,9 @@ export default function AlertCard({ variant, title, children }: AlertCardProps) 
         </View>
       )}
 
-      <View style={title ? styles.contentWithTitle : styles.contentWithoutTitle}>
+      <View
+        style={title ? styles.contentWithTitle : styles.contentWithoutTitle}
+      >
         {!title && (
           <View style={[styles.iconWrapper, { marginRight: 6 }]}>
             <NativeIcon
@@ -90,7 +96,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     marginRight: 6,
-    height: 20, // Matches line height of title roughly for vertical alignment
+    height: 20,
   },
   title: {
     fontSize: 15,
@@ -99,7 +105,7 @@ const styles = StyleSheet.create({
     lineHeight: 20,
   },
   contentWithTitle: {
-    paddingLeft: 22, // Indents children to align with text
+    paddingLeft: 22,
   },
   contentWithoutTitle: {
     flexDirection: "row",
