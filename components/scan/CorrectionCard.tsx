@@ -34,7 +34,6 @@ export default function CorrectionCard({
         styles.correctionCardOverrides,
         {
           borderColor: colors.separator,
-          backgroundColor: colors.systemGroupedBackground,
         },
       ]}
     >

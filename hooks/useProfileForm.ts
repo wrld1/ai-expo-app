@@ -19,7 +19,7 @@ export const profileSchema = z.object({
 
 export type ProfileFormData = z.infer<typeof profileSchema>;
 
-export function useProfileForm() {
+export function useProfileForm(onSuccess?: () => void) {
   const { profile, updateProfile } = useProfile();
   const [isSaving, setIsSaving] = useState(false);
 
@@ -48,6 +48,7 @@ export function useProfileForm() {
     try {
       await updateProfile(data);
       Alert.alert("Успіх", "Профіль успішно збережено!");
+      if (onSuccess) onSuccess();
     } catch {
       triggerHapticError();
       Alert.alert("Помилка", "Не вдалося зберегти профіль");
