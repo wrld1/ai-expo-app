@@ -1,8 +1,7 @@
 import HistoryEmptyState from "@/components/history/HistoryEmptyState";
 import HistoryItemCard from "@/components/history/HistoryItemCard";
-import HistoryItemModal from "@/components/history/HistoryItemModal";
 import { useRouter } from "expo-router";
-import React, { useState } from "react";
+import React from "react";
 import {
   Alert,
   FlatList,
@@ -23,7 +22,6 @@ import {
 
 export default function HistoryScreen() {
   const { history, deleteHistoryItem, clearHistory } = useHistory();
-  const [selectedItem, setSelectedItem] = useState<HistoryItem | null>(null);
   const router = useRouter();
 
   const handleDelete = (id: string) => {
@@ -38,9 +36,6 @@ export default function HistoryScreen() {
           style: "destructive",
           onPress: async () => {
             await deleteHistoryItem(id);
-            if (selectedItem?.id === id) {
-              setSelectedItem(null);
-            }
             triggerHapticSuccess();
           },
         },
@@ -60,7 +55,6 @@ export default function HistoryScreen() {
           style: "destructive",
           onPress: async () => {
             await clearHistory();
-            setSelectedItem(null);
             triggerHapticSuccess();
           },
         },
@@ -71,7 +65,9 @@ export default function HistoryScreen() {
   const renderHistoryItem = ({ item }: { item: HistoryItem }) => (
     <HistoryItemCard
       item={item}
-      onPress={setSelectedItem}
+      onPress={(item) =>
+        router.push({ pathname: "/history-modal", params: { id: item.id } })
+      }
       onDelete={handleDelete}
     />
   );
@@ -116,16 +112,6 @@ export default function HistoryScreen() {
           }}
         />
       )}
-
-      <HistoryItemModal
-        visible={selectedItem !== null}
-        item={selectedItem}
-        onClose={() => setSelectedItem(null)}
-        onDelete={(id) => {
-          handleDelete(id);
-          setSelectedItem(null);
-        }}
-      />
     </SafeAreaView>
   );
 }

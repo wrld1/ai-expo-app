@@ -12,6 +12,7 @@ export default function RootLayout() {
           <StatusBar />
           <Stack screenOptions={{ headerShown: false }}>
             <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+            <Stack.Screen name="history-modal" options={{ presentation: 'modal' }} />
           </Stack>
         </GestureHandlerRootView>
       </HistoryProvider>
