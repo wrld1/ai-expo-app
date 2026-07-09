@@ -1,9 +1,11 @@
 import { StyleSheet, Text, View } from "react-native";
 import { colors, nativeStyles } from "../../constants/theme";
-import { ScanResult, AnalysisWarning } from "../../types/history";
-import MacroProgress from "./MacroProgress";
+import { AnalysisWarning, ScanResult } from "../../types/history";
 import Card from "../ui/Card";
+import Divider from "../ui/Divider";
 import NativeIcon from "../ui/NativeIcon";
+import AlertCard from "./AlertCard";
+import MacroProgress from "./MacroProgress";
 
 interface ScanResultCardProps {
   result: ScanResult;
@@ -40,50 +42,43 @@ export default function ScanResultCard({ result }: ScanResultCardProps) {
       </Card>
 
       {result.allergyAlerts && result.allergyAlerts.length > 0 && (
-        <Card style={[styles.resultsCardOverrides, { backgroundColor: 'rgba(255, 59, 48, 0.1)', borderColor: colors.systemRed, borderWidth: 1 }]}>
-          <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 8 }}>
-            <NativeIcon sf="exclamationmark.octagon.fill" ion="alert-circle" size={20} color={colors.systemRed} />
-            <Text style={[styles.resultsCardTitle, { color: colors.systemRed, marginLeft: 8 }]}>Увага! Алергени</Text>
-          </View>
-          <Text style={{ color: colors.label, fontSize: 14 }}>
-            Можлива наявність алергенів: <Text style={{ fontWeight: 'bold' }}>{result.allergyAlerts.join(", ")}</Text>
+        <AlertCard variant="danger" title="Увага! Алергени">
+          <Text style={{ color: colors.label, fontSize: 13, lineHeight: 18 }}>
+            Можлива наявність алергенів:{" "}
+            <Text style={{ fontWeight: "700" }}>
+              {result.allergyAlerts.join(", ")}
+            </Text>
           </Text>
-        </Card>
+        </AlertCard>
       )}
 
       {result.medicalAdviceRequested && (
-        <Card style={[styles.resultsCardOverrides, { backgroundColor: 'rgba(255, 149, 0, 0.1)', borderColor: colors.systemOrange, borderWidth: 1 }]}>
-          <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 8 }}>
-            <NativeIcon sf="waveform.path.ecg" ion="medical" size={20} color={colors.systemOrange} />
-            <Text style={[styles.resultsCardTitle, { color: colors.systemOrange, marginLeft: 8 }]}>Медичне застереження</Text>
-          </View>
-          <Text style={{ color: colors.label, fontSize: 14 }}>
-            Штучний інтелект не може надавати медичні діагнози або поради.
-          </Text>
-        </Card>
+        <AlertCard variant="warning" title="Медичне застереження">
+          Штучний інтелект не може надавати медичні діагнози або поради.
+        </AlertCard>
       )}
 
       {result.warnings && result.warnings.length > 0 && (
-        <Card style={[styles.resultsCardOverrides, { backgroundColor: 'rgba(255, 204, 0, 0.1)', borderColor: colors.systemYellow, borderWidth: 1 }]}>
-           <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 8 }}>
-            <NativeIcon sf="exclamationmark.triangle.fill" ion="warning" size={20} color={colors.systemYellow} />
-            <Text style={[styles.resultsCardTitle, { color: colors.systemYellow, marginLeft: 8 }]}>Зауваження щодо аналізу</Text>
-          </View>
+        <AlertCard variant="info" title="Зауваження щодо аналізу">
           {result.warnings.map((w, idx) => (
-             <Text key={idx} style={{ color: colors.label, fontSize: 14, marginBottom: 4 }}>
-               • {getWarningText(w)}
-             </Text>
+            <Text
+              key={idx}
+              style={{ color: colors.label, fontSize: 13, lineHeight: 18, marginBottom: 4 }}
+            >
+              • {getWarningText(w)}
+            </Text>
           ))}
-        </Card>
+        </AlertCard>
       )}
-      
-      {result.confidence === 'low' && (!result.warnings || result.warnings.length === 0) && (
-        <Card style={[styles.resultsCardOverrides, { backgroundColor: 'rgba(255, 204, 0, 0.1)', borderColor: colors.systemYellow, borderWidth: 1 }]}>
-           <Text style={{ color: colors.systemYellow, fontSize: 14, fontWeight: '500' }}>
-             Низька впевненість розпізнавання. Будь ласка, перевірте результати.
-           </Text>
-        </Card>
-      )}
+
+      {result.confidence === "low" &&
+        (!result.warnings || result.warnings.length === 0) && (
+          <AlertCard variant="info">
+            <Text style={{ color: colors.systemYellow, fontSize: 13, fontWeight: "600" }}>
+              Низька впевненість розпізнавання. Будь ласка, перевірте результати.
+            </Text>
+          </AlertCard>
+        )}
 
       <Card style={styles.resultsCardOverrides}>
         <Text style={[styles.resultsCardTitle, { color: colors.label }]}>
@@ -123,19 +118,18 @@ export default function ScanResultCard({ result }: ScanResultCardProps) {
             Виявлені інгредієнти
           </Text>
           {result.ingredients.map((ing, idx) => (
-            <View
-              key={idx}
-              style={[
-                styles.ingredientRow,
-                { borderBottomColor: colors.separator },
-              ]}
-            >
-              <Text style={[styles.ingredientName, { color: colors.label }]}>
-                • {ing.name}
-              </Text>
-              <Text style={[styles.ingredientWeight, { color: colors.accent }]}>
-                {ing.weight}
-              </Text>
+            <View key={idx}>
+              <View style={styles.ingredientRow}>
+                <Text style={[styles.ingredientName, { color: colors.label }]}>
+                  • {ing.name}
+                </Text>
+                <Text
+                  style={[styles.ingredientWeight, { color: colors.accent }]}
+                >
+                  {ing.weight}
+                </Text>
+              </View>
+              {idx < result.ingredients!.length - 1 && <Divider />}
             </View>
           ))}
         </Card>
@@ -196,9 +190,22 @@ export default function ScanResultCard({ result }: ScanResultCardProps) {
           </Text>
         </View>
 
-        <Text style={[nativeStyles.sectionTitle, { marginTop: 16 }]}>
-          Висновок AI:
-        </Text>
+        <View style={[styles.sectionHeaderRow, { marginTop: 16 }]}>
+          <NativeIcon
+            sf="brain.head.profile"
+            ion="bulb-outline"
+            size={18}
+            color={colors.accent}
+          />
+          <Text
+            style={[
+              nativeStyles.sectionTitle,
+              { marginTop: 0, marginBottom: 0, marginLeft: 8 },
+            ]}
+          >
+            Висновок AI:
+          </Text>
+        </View>
         <View style={[nativeStyles.innerBox]}>
           <Text
             style={[styles.summaryText, { color: colors.label }]}
@@ -233,19 +240,18 @@ const styles = StyleSheet.create({
   sectionHeaderRow: {
     flexDirection: "row",
     alignItems: "center",
-    marginBottom: 8,
-    marginTop: 8,
-    marginLeft: 16,
+    marginBottom: 10,
+    marginTop: 4,
   },
   resultsCardTitle: {
     fontSize: 18,
     fontWeight: "700",
+    marginBottom: 16,
   },
   ingredientRow: {
     flexDirection: "row",
     justifyContent: "space-between",
-    paddingVertical: 10,
-    borderBottomWidth: StyleSheet.hairlineWidth,
+    paddingVertical: 12,
   },
   ingredientName: {
     fontSize: 15,

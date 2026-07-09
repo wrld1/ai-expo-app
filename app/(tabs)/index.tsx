@@ -95,10 +95,7 @@ export default function ScanScreen() {
 
             {scanResult && (
               <LayoutAnimationConfig skipEntering>
-                <Animated.View
-                  entering={FadeInUp}
-                  style={styles.resultsContainer}
-                >
+                <Animated.View entering={FadeInUp}>
                   <ScanResultCard result={scanResult} />
 
                   <View style={styles.warningCard}>
@@ -153,13 +150,13 @@ const styles = StyleSheet.create({
     fontSize: 12,
     marginTop: 4,
   },
-  resultsContainer: {},
   warningCard: {
     flexDirection: "row",
     backgroundColor: "rgba(255, 255, 255, 0.02)",
     borderRadius: 10,
     borderCurve: "continuous",
-    padding: 10,
+    paddingLeft: 10,
+    paddingRight: 10,
     marginBottom: 12,
     alignItems: "flex-start",
   },

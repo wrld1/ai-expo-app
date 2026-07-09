@@ -225,7 +225,6 @@ const styles = StyleSheet.create({
     fontSize: 12,
   },
   modalFooterActions: {
-    marginTop: 24,
     alignItems: "center",
   },
   modalDeleteBtn: {

@@ -1,6 +1,5 @@
 import * as ImageManipulator from "expo-image-manipulator";
 import { Platform } from "react-native";
-import { z } from "zod";
 import {
   AnalysisConfidence,
   AnalysisWarning,
@@ -14,16 +13,11 @@ const API_URL =
     ? "http://10.0.2.2:3000/api/analyze"
     : "http://localhost:3000/api/analyze");
 
-const getBackendUrl = () => {
-  return API_URL;
-};
-
 export async function analyzeFoodImageBackend(
   imageUri: string,
   profile: ProfileData,
   correctionText?: string,
 ): Promise<ScanResult> {
-  const url = getBackendUrl();
   const formData = new FormData();
 
   let finalUri = imageUri;
@@ -51,7 +45,7 @@ export async function analyzeFoodImageBackend(
   }
 
   try {
-    const response = await fetch(url, {
+    const response = await fetch(API_URL, {
       method: "POST",
       body: formData,
       headers: {
@@ -108,10 +102,9 @@ export async function analyzeFoodImageBackend(
           | AnalysisConfidence
           | undefined,
       })),
-      whatIsGood:
-        Array.isArray(data.good_points)
-          ? data.good_points.map((p: any) => `• ${p}`).join("\n")
-          : "Немає даних",
+      whatIsGood: Array.isArray(data.good_points)
+        ? data.good_points.map((p: any) => `• ${p}`).join("\n")
+        : "Немає даних",
       risks: Array.isArray(data.bad_points)
         ? data.bad_points.map((p: any) => `• ${p}`).join("\n") || "Немає даних"
         : "Немає даних",
