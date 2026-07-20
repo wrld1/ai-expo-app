@@ -46,58 +46,80 @@ export async function analyzeFoodImageBackend(
     formData.append("correctionPrompt", correctionText);
   }
 
-  try {
-    const response = await fetch(API_URL, {
+  const response = await fetch(API_URL, {
+    method: "POST",
+    body: formData,
+    headers: {
+      Accept: "application/json",
+    },
+  });
+
+  return toScanResult(await readResponse(response));
+}
+
+export async function correctAnalysisBackend(
+  analysisId: string,
+  correctionText: string,
+): Promise<ScanResult> {
+  const response = await fetch(
+    `${API_URL}/${encodeURIComponent(analysisId)}/correction`,
+    {
       method: "POST",
-      body: formData,
       headers: {
         Accept: "application/json",
+        "Content-Type": "application/json",
       },
-    });
+      body: JSON.stringify({ correctionText }),
+    },
+  );
 
-    if (!response.ok) {
-      let errorMsg = "Помилка сервера";
-      try {
-        const errorJson = await response.json();
-        errorMsg = errorJson.error || errorMsg;
-      } catch {}
-      throw new Error(errorMsg);
-    }
+  return toScanResult(await readResponse(response));
+}
 
-    const data: AnalyzeResponse = await response.json();
+export class AnalysisSessionExpiredError extends Error {}
 
-    const safeNumber = (val: unknown): number | null => {
-      if (typeof val === "number") return val;
-      return null;
-    };
+async function readResponse(response: Response): Promise<AnalyzeResponse> {
+  if (response.ok) return response.json();
 
-    return {
-      confidence: data.confidence,
-      warnings: data.warnings ?? [],
-      medicalAdviceRequested: data.medical_advice_requested,
-      allergyAlerts: data.allergy_alerts ?? [],
-      promptVersion: data.prompt_version,
-      dailyNorm: data.daily_norm
-        ? {
-            calories: data.daily_norm.calories,
-            percentOfNorm: data.daily_norm.percent_of_norm,
-          }
-        : null,
-      foodName: formatFoodName(data.detected_food),
-      calories: safeNumber(data.total.calories),
-      protein: safeNumber(data.total.protein),
-      fat: safeNumber(data.total.fat),
-      carbs: safeNumber(data.total.carbs),
-      ingredients: data.detected_food.map((food) => ({
-        name: food.name,
-        weight: food.estimated_weight || "Невідомо",
-        confidence: food.estimated_weight_confidence,
-      })),
-      whatIsGood: Array.isArray(data.good_points) ? data.good_points : [],
-      risks: Array.isArray(data.bad_points) ? data.bad_points : [],
-      summary: data.personalized_summary || "",
-    };
-  } catch (error) {
-    throw error;
-  }
+  let errorMsg = "Помилка сервера";
+  try {
+    const errorJson = await response.json();
+    errorMsg = errorJson.error || errorMsg;
+  } catch {}
+
+  if (response.status === 404) throw new AnalysisSessionExpiredError(errorMsg);
+  throw new Error(errorMsg);
+}
+
+function toScanResult(data: AnalyzeResponse): ScanResult {
+  const safeNumber = (val: unknown): number | null =>
+    typeof val === "number" ? val : null;
+
+  return {
+    analysisId: data.analysis_id,
+    confidence: data.confidence,
+    warnings: data.warnings ?? [],
+    medicalAdviceRequested: data.medical_advice_requested,
+    allergyAlerts: data.allergy_alerts ?? [],
+    promptVersion: data.prompt_version,
+    dailyNorm: data.daily_norm
+      ? {
+          calories: data.daily_norm.calories,
+          percentOfNorm: data.daily_norm.percent_of_norm,
+        }
+      : null,
+    foodName: formatFoodName(data.detected_food),
+    calories: safeNumber(data.total.calories),
+    protein: safeNumber(data.total.protein),
+    fat: safeNumber(data.total.fat),
+    carbs: safeNumber(data.total.carbs),
+    ingredients: data.detected_food.map((food) => ({
+      name: food.name,
+      weight: food.estimated_weight || "Невідомо",
+      confidence: food.estimated_weight_confidence,
+    })),
+    whatIsGood: Array.isArray(data.good_points) ? data.good_points : [],
+    risks: Array.isArray(data.bad_points) ? data.bad_points : [],
+    summary: data.personalized_summary || "",
+  };
 }

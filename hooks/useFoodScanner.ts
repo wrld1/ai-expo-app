@@ -1,7 +1,11 @@
 import * as ImagePicker from "expo-image-picker";
 import { useState } from "react";
 import { Alert, Platform } from "react-native";
-import { analyzeFoodImageBackend } from "../api/analyze";
+import {
+  AnalysisSessionExpiredError,
+  analyzeFoodImageBackend,
+  correctAnalysisBackend,
+} from "../api/analyze";
 import { useHistory } from "../context/HistoryContext";
 import { useProfile } from "../context/ProfileContext";
 import { ScanResult } from "../types/history";
@@ -99,21 +103,33 @@ export function useFoodScanner() {
     if (!imageUri || !scanResult || !historyId || !correctionText.trim())
       return;
 
+    const text = correctionText.trim();
+
     triggerHapticMedium();
     setIsCorrecting(true);
     try {
-      const updatedResult = await analyzeFoodImageBackend(
-        imageUri,
-        profile,
-        correctionText.trim(),
-      );
+      let updatedResult: ScanResult;
+
+      if (scanResult.analysisId) {
+        try {
+          updatedResult = await correctAnalysisBackend(
+            scanResult.analysisId,
+            text,
+          );
+        } catch (error) {
+          if (!(error instanceof AnalysisSessionExpiredError)) throw error;
+          updatedResult = await analyzeFoodImageBackend(
+            imageUri,
+            profile,
+            text,
+          );
+        }
+      } else {
+        updatedResult = await analyzeFoodImageBackend(imageUri, profile, text);
+      }
 
       setScanResult(updatedResult);
-      await updateHistoryItemResult(
-        historyId,
-        updatedResult,
-        correctionText.trim(),
-      );
+      await updateHistoryItemResult(historyId, updatedResult, text);
       triggerHapticSuccess();
       Alert.alert("Успіх", "Аналіз страви успішно оновлено!");
     } catch (error: any) {

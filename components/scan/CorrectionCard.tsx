@@ -8,6 +8,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import { CORRECTION_MAX_LENGTH } from "../../constants/limits";
 import { colors } from "../../constants/theme";
 import Card from "../ui/Card";
 import NativeIcon from "../ui/NativeIcon";
@@ -60,6 +61,7 @@ export default function CorrectionCard({
           onChangeText={setText}
           placeholder="Напишіть уточнення тут..."
           placeholderTextColor={colors.placeholder}
+          maxLength={CORRECTION_MAX_LENGTH}
           multiline
         />
         <TouchableOpacity
@@ -86,6 +88,14 @@ export default function CorrectionCard({
           )}
         </TouchableOpacity>
       </View>
+
+      {text.length > CORRECTION_MAX_LENGTH * 0.8 && (
+        <Text
+          style={[styles.correctionCounter, { color: colors.secondaryLabel }]}
+        >
+          {text.length} / {CORRECTION_MAX_LENGTH}
+        </Text>
+      )}
     </Card>
   );
 }
@@ -131,6 +141,11 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     marginLeft: 6,
+  },
+  correctionCounter: {
+    fontSize: 11,
+    textAlign: "right",
+    marginTop: 6,
   },
   sendCorrectionBtnDisabled: {
     backgroundColor: "transparent",

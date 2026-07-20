@@ -10,6 +10,7 @@ export interface AllergyAlertResponse {
 
 export interface AnalyzeResponse {
   prompt_version: string;
+  analysis_id?: string;
   confidence: AnalysisConfidence;
   warnings: AnalysisWarning[];
   medical_advice_requested: boolean;

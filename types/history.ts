@@ -27,6 +27,7 @@ export interface DailyNorm {
 }
 
 export interface ScanResult {
+  analysisId?: string;
   confidence: AnalysisConfidence;
   warnings: AnalysisWarning[];
   allergyAlerts: (AllergyAlert | string)[];
