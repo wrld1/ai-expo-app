@@ -1,14 +1,16 @@
 import { AnalyzeResponse } from "@/types/analyze";
 import { ImageManipulator, SaveFormat } from "expo-image-manipulator";
-import {
-  AnalysisConfidence,
-  AnalysisWarning,
-  ScanResult,
-} from "../types/history";
+import { ScanResult } from "../types/history";
 import { ProfileData } from "../types/profile";
 
 const API_URL =
   (process.env.EXPO_PUBLIC_API_URL || "http://localhost:3000") + "/api/analyze";
+
+function formatFoodName(detected: AnalyzeResponse["detected_food"]): string {
+  const [first, ...rest] = detected ?? [];
+  if (!first) return "Невідома страва";
+  return rest.length > 0 ? `${first.name} +${rest.length}` : first.name;
+}
 
 export async function analyzeFoodImageBackend(
   imageUri: string,
@@ -64,33 +66,24 @@ export async function analyzeFoodImageBackend(
 
     const data: AnalyzeResponse = await response.json();
 
-    const userAllergies = (profile.allergies || []).map((a) => a.toLowerCase());
-    const allergyAlerts: string[] = [];
-
-    if (userAllergies.length > 0) {
-      for (const food of data.detected_food) {
-        const foodNameLower = food.name.toLowerCase();
-        for (const allergy of userAllergies) {
-          if (foodNameLower.includes(allergy)) {
-            if (!allergyAlerts.includes(allergy)) {
-              allergyAlerts.push(allergy);
-            }
-          }
-        }
-      }
-    }
-
     const safeNumber = (val: unknown): number | null => {
       if (typeof val === "number") return val;
       return null;
     };
 
     return {
-      confidence: data.confidence as AnalysisConfidence,
-      warnings: data.warnings as AnalysisWarning[],
+      confidence: data.confidence,
+      warnings: data.warnings ?? [],
       medicalAdviceRequested: data.medical_advice_requested,
-      allergyAlerts,
-      foodName: data.detected_food[0]?.name || "Невідома страва",
+      allergyAlerts: data.allergy_alerts ?? [],
+      promptVersion: data.prompt_version,
+      dailyNorm: data.daily_norm
+        ? {
+            calories: data.daily_norm.calories,
+            percentOfNorm: data.daily_norm.percent_of_norm,
+          }
+        : null,
+      foodName: formatFoodName(data.detected_food),
       calories: safeNumber(data.total.calories),
       protein: safeNumber(data.total.protein),
       fat: safeNumber(data.total.fat),
@@ -98,9 +91,7 @@ export async function analyzeFoodImageBackend(
       ingredients: data.detected_food.map((food) => ({
         name: food.name,
         weight: food.estimated_weight || "Невідомо",
-        confidence: food.estimated_weight_confidence as
-          | AnalysisConfidence
-          | undefined,
+        confidence: food.estimated_weight_confidence,
       })),
       whatIsGood: Array.isArray(data.good_points) ? data.good_points : [],
       risks: Array.isArray(data.bad_points) ? data.bad_points : [],

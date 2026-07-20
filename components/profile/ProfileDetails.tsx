@@ -1,3 +1,4 @@
+import { ACTIVITY_OPTIONS } from "@/constants/profile";
 import React from "react";
 import { StyleSheet, Text, View } from "react-native";
 import { colors } from "../../constants/theme";
@@ -20,6 +21,25 @@ export default function ProfileDetails({ profile }: ProfileDetailsProps) {
         />
         <Divider />
         <SettingsRow label="Стать" value={profile.gender || "Не вказано"} />
+        <Divider />
+        <SettingsRow
+          label="Вага"
+          value={profile.weightKg ? `${profile.weightKg} кг` : "Не вказано"}
+        />
+        <Divider />
+        <SettingsRow
+          label="Зріст"
+          value={profile.heightCm ? `${profile.heightCm} см` : "Не вказано"}
+        />
+        <Divider />
+        <SettingsRow
+          label="Активність"
+          value={
+            ACTIVITY_OPTIONS.find(
+              (option) => option.value === profile.activityLevel,
+            )?.label ?? "Не вказано"
+          }
+        />
       </FormSection>
 
       <FormSection title="Алергії та обмеження">

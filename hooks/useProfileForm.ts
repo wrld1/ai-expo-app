@@ -13,6 +13,12 @@ import {
 export const profileSchema = z.object({
   age: z.string().min(1, "Вік обов'язковий"),
   gender: z.string(),
+  // Потрібні для добової норми калорій, але не блокують збереження профілю.
+  weightKg: z.string().optional(),
+  heightCm: z.string().optional(),
+  activityLevel: z
+    .enum(["sedentary", "light", "moderate", "active", "very_active"])
+    .optional(),
   allergies: z.array(z.string()),
   concerns: z.array(z.string()),
 });
@@ -28,6 +34,9 @@ export function useProfileForm(onSuccess?: () => void) {
     defaultValues: {
       age: "25",
       gender: "Інша",
+      weightKg: undefined,
+      heightCm: undefined,
+      activityLevel: undefined,
       allergies: [],
       concerns: [],
     },
@@ -37,6 +46,9 @@ export function useProfileForm(onSuccess?: () => void) {
     form.reset({
       age: profile.age || "25",
       gender: profile.gender || "Інша",
+      weightKg: profile.weightKg,
+      heightCm: profile.heightCm,
+      activityLevel: profile.activityLevel,
       allergies: profile.allergies || [],
       concerns: profile.concerns || [],
     });

@@ -1,7 +1,7 @@
 import { getWarningText } from "@/constants/warning-text";
 import { StyleSheet, Text, View } from "react-native";
 import { colors, nativeStyles } from "../../constants/theme";
-import { ScanResult } from "../../types/history";
+import { AllergyAlert, Likelihood, ScanResult } from "../../types/history";
 import Card from "../ui/Card";
 import Divider from "../ui/Divider";
 import NativeIcon from "../ui/NativeIcon";
@@ -12,6 +12,26 @@ import MacroProgress from "./MacroProgress";
 interface ScanResultCardProps {
   result: ScanResult;
   isCorrecting?: boolean;
+}
+
+const LIKELIHOOD_TEXT: Record<Likelihood, string> = {
+  certain: "виявлено у складі",
+  likely: "ймовірно присутній",
+  possible: "можливий",
+};
+
+/** Записи зі старої історії зберігалися як рядок — показуємо і їх. */
+function normalizeAllergyAlert(
+  alert: AllergyAlert | string,
+): { label: string; likelihood?: Likelihood; matchedIn: string[] } {
+  if (typeof alert === "string") {
+    return { label: alert, matchedIn: [] };
+  }
+  return {
+    label: alert.label || alert.allergen,
+    likelihood: alert.likelihood,
+    matchedIn: alert.matchedIn ?? [],
+  };
 }
 
 export default function ScanResultCard({ result, isCorrecting }: ScanResultCardProps) {
@@ -32,11 +52,34 @@ export default function ScanResultCard({ result, isCorrecting }: ScanResultCardP
 
       {result.allergyAlerts && result.allergyAlerts.length > 0 && (
         <AlertCard variant="danger" title="Увага! Алергени">
-          <Text style={{ color: colors.label, fontSize: 13, lineHeight: 18 }}>
-            Можлива наявність алергенів:{" "}
-            <Text style={{ fontWeight: "700" }}>
-              {result.allergyAlerts.join(", ")}
-            </Text>
+          {result.allergyAlerts.map((alert, idx) => {
+            const item = normalizeAllergyAlert(alert);
+            return (
+              <Text
+                key={idx}
+                style={{
+                  color: colors.label,
+                  fontSize: 13,
+                  lineHeight: 18,
+                  marginBottom: 4,
+                }}
+              >
+                • <Text style={{ fontWeight: "700" }}>{item.label}</Text>
+                {item.likelihood ? ` — ${LIKELIHOOD_TEXT[item.likelihood]}` : ""}
+                {item.matchedIn.length > 0 ? ` (${item.matchedIn.join(", ")})` : ""}
+              </Text>
+            );
+          })}
+          <Text
+            style={{
+              color: colors.secondaryLabel,
+              fontSize: 12,
+              lineHeight: 16,
+              marginTop: 4,
+            }}
+          >
+            Це оцінка AI, а не гарантія складу. При серйозній алергії перевіряйте
+            склад у виробника.
           </Text>
         </AlertCard>
       )}
@@ -92,9 +135,22 @@ export default function ScanResultCard({ result, isCorrecting }: ScanResultCardP
           Макронутрієнти
         </Text>
 
+        {result.dailyNorm?.percentOfNorm != null && (
+          <Text
+            style={{
+              color: colors.secondaryLabel,
+              fontSize: 13,
+              marginBottom: 12,
+            }}
+          >
+            {result.dailyNorm.percentOfNorm}% вашої добової норми (
+            {result.dailyNorm.calories} ккал)
+          </Text>
+        )}
+
         <MacroProgress
           value={result.calories}
-          total={1000}
+          total={result.dailyNorm?.calories ?? 1000}
           label="Калорійність"
           color="#FF5252"
           suffix=" ккал"

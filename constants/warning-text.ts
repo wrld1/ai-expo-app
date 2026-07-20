@@ -10,6 +10,8 @@ export const getWarningText = (warning: AnalysisWarning) => {
       return "Можливі приховані інгредієнти (наприклад, у соусі чи начинці).";
     case "weight_estimation_uncertain":
       return "Складно визначити точну вагу порції.";
+    case "not_food":
+      return "На фото не вдалося розпізнати їжу.";
     default:
       return "Увага: результати можуть бути неточними.";
   }

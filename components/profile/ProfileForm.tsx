@@ -3,9 +3,15 @@ import AllergiesSection from "@/components/profile/AllergiesSection";
 import ChipsGroup from "@/components/profile/ChipsGroup";
 import FormSection from "@/components/profile/FormSection";
 import GenderSelector from "@/components/profile/GenderSelector";
+import OptionPicker from "@/components/profile/OptionPicker";
 import Button from "@/components/ui/Button";
 import Divider from "@/components/ui/Divider";
-import { CONCERN_PRESETS } from "@/constants/profile";
+import {
+  ACTIVITY_OPTIONS,
+  CONCERN_PRESETS,
+  HEIGHT_VALUES,
+  WEIGHT_VALUES,
+} from "@/constants/profile";
 import React from "react";
 import { Control, Controller } from "react-hook-form";
 import { StyleSheet, Text, View } from "react-native";
@@ -39,6 +45,51 @@ export default function ProfileForm({
           name="gender"
           render={({ field }) => (
             <GenderSelector value={field.value} onChange={field.onChange} />
+          )}
+        />
+      </FormSection>
+
+      <FormSection title="Для розрахунку добової норми">
+        <Text style={[styles.rowSubText, { color: colors.secondaryLabel }]}>
+          Необов'язково. Якщо вкажете — AI рахуватиме, яку частку вашої денної
+          норми складає страва.
+        </Text>
+        <Controller
+          control={control}
+          name="weightKg"
+          render={({ field }) => (
+            <OptionPicker
+              label="Вага, кг"
+              value={field.value}
+              options={WEIGHT_VALUES.map((v) => ({ value: v, label: `${v} кг` }))}
+              onChange={field.onChange}
+            />
+          )}
+        />
+        <Divider />
+        <Controller
+          control={control}
+          name="heightCm"
+          render={({ field }) => (
+            <OptionPicker
+              label="Зріст, см"
+              value={field.value}
+              options={HEIGHT_VALUES.map((v) => ({ value: v, label: `${v} см` }))}
+              onChange={field.onChange}
+            />
+          )}
+        />
+        <Divider />
+        <Controller
+          control={control}
+          name="activityLevel"
+          render={({ field }) => (
+            <OptionPicker
+              label="Активність"
+              value={field.value}
+              options={ACTIVITY_OPTIONS}
+              onChange={field.onChange}
+            />
           )}
         />
       </FormSection>
