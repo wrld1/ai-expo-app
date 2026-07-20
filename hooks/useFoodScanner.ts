@@ -25,7 +25,8 @@ export function useFoodScanner() {
   const requestPermissions = async () => {
     if (Platform.OS !== "web") {
       const cameraPerm = await ImagePicker.requestCameraPermissionsAsync();
-      const libraryPerm = await ImagePicker.requestMediaLibraryPermissionsAsync();
+      const libraryPerm =
+        await ImagePicker.requestMediaLibraryPermissionsAsync();
       return cameraPerm.granted && libraryPerm.granted;
     }
     return true;
@@ -39,7 +40,7 @@ export function useFoodScanner() {
         triggerHapticError();
         Alert.alert(
           "Доступ обмежено",
-          "Будь ласка, дозвольте доступ до камери та галереї у налаштуваннях пристрою."
+          "Будь ласка, дозвольте доступ до камери та галереї у налаштуваннях пристрою.",
         );
         return;
       }
@@ -47,7 +48,7 @@ export function useFoodScanner() {
       const options: ImagePicker.ImagePickerOptions = {
         allowsEditing: true,
         aspect: [4, 3],
-        quality: 0.8,
+        quality: 1.0,
       };
 
       const result =
@@ -66,7 +67,7 @@ export function useFoodScanner() {
       triggerHapticError();
       Alert.alert(
         "Помилка",
-        `Не вдалося відкрити ${source === "camera" ? "камеру" : "галерею"}.`
+        `Не вдалося відкрити ${source === "camera" ? "камеру" : "галерею"}.`,
       );
     }
   };
@@ -87,7 +88,7 @@ export function useFoodScanner() {
       triggerHapticError();
       Alert.alert(
         "Помилка аналізу",
-        error.message || "Сталася невідома помилка."
+        error.message || "Сталася невідома помилка.",
       );
     } finally {
       setIsAnalyzing(false);
@@ -95,7 +96,8 @@ export function useFoodScanner() {
   };
 
   const handleCorrection = async (correctionText: string) => {
-    if (!imageUri || !scanResult || !historyId || !correctionText.trim()) return;
+    if (!imageUri || !scanResult || !historyId || !correctionText.trim())
+      return;
 
     triggerHapticMedium();
     setIsCorrecting(true);
@@ -103,18 +105,22 @@ export function useFoodScanner() {
       const updatedResult = await analyzeFoodImageBackend(
         imageUri,
         profile,
-        correctionText.trim()
+        correctionText.trim(),
       );
 
       setScanResult(updatedResult);
-      await updateHistoryItemResult(historyId, updatedResult, correctionText.trim());
+      await updateHistoryItemResult(
+        historyId,
+        updatedResult,
+        correctionText.trim(),
+      );
       triggerHapticSuccess();
       Alert.alert("Успіх", "Аналіз страви успішно оновлено!");
     } catch (error: any) {
       triggerHapticError();
       Alert.alert(
         "Помилка оновлення",
-        error.message || "Не вдалося оновити аналіз."
+        error.message || "Не вдалося оновити аналіз.",
       );
     } finally {
       setIsCorrecting(false);

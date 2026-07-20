@@ -20,11 +20,11 @@ export async function analyzeFoodImageBackend(
   let finalUri = imageUri;
   try {
     const imageRef = await ImageManipulator.manipulate(imageUri)
-      .resize({ width: 800 })
+      .resize({ width: 1280 })
       .renderAsync();
 
     const manipResult = await imageRef.saveAsync({
-      compress: 0.7,
+      compress: 0.85,
       format: SaveFormat.JPEG,
     });
     finalUri = manipResult.uri;
